@@ -1,0 +1,13 @@
+**/node_modules/
+**/dist/
+**/__pycache__/
+**/*.pyc
+**/.env
+**/.worker_data/
+**/.task_exec/
+**/.storage/
+.venv/
+.test-data/
+*.log
+infra/.env
+tmp/

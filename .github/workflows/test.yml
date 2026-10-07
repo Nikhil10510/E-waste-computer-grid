@@ -1,0 +1,38 @@
+name: Grid checks
+on: [push, pull_request]
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ewaste
+          POSTGRES_PASSWORD: test-password
+          POSTGRES_DB: ewaste
+        ports: ["5432:5432"]
+        options: --health-cmd="pg_isready -U ewaste" --health-interval=5s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m venv .venv
+      - run: .venv/bin/python -m pip install -r worker/requirements.txt -r workloads/ai-inference/requirements.txt
+      - run: .venv/bin/python -m unittest discover -s workloads/tests -v
+      - run: .venv/bin/python -m unittest discover -s worker/tests -v
+      - run: npm ci
+        working-directory: control-plane
+      - run: npm test
+        working-directory: control-plane
+        env:
+          TEST_DATABASE_URL: postgresql://ewaste:test-password@localhost:5432/ewaste
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run build
+        working-directory: frontend
+      - run: npm run lint
+        working-directory: frontend

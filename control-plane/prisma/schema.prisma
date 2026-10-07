@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Node {
+  id               String   @id @default(uuid())
+  nodeSecret       String   @default(uuid())
+  registrationKey  String?  @unique
+  status           String   @default("ONLINE")
+  cpuCores         Int
+  name             String   @default("Worker")
+  ramGb            Float
+  os               String   @default("linux")
+  capabilities     Json
+  baselinePowerW   Float
+  lastHeartbeat    DateTime @default(now())
+  createdAt        DateTime @default(now())
+  
+  tasks            Task[]
+  metrics          Metric[]
+  @@index([status, lastHeartbeat])
+}
+
+model Job {
+  id             String   @id @default(uuid())
+  name           String
+  status         String   @default("PENDING")
+  totalTasks     Int
+  completedTasks Int      @default(0)
+  failedTasks    Int      @default(0)
+  requestKey     String?  @unique
+  requestHash    String?
+  createdAt      DateTime @default(now())
+  completedAt    DateTime?
+  
+  tasks          Task[]
+  metrics        Metric[]
+  @@index([createdAt])
+}
+
+model Task {
+  id             String   @id @default(uuid())
+  jobId          String
+  job            Job      @relation(fields: [jobId], references: [id])
+  nodeId         String?
+  node           Node?    @relation(fields: [nodeId], references: [id])
+  status         String   @default("QUEUED")
+  payload        Json
+  result         Json?
+  retryCount     Int      @default(0)
+  leaseExpiresAt DateTime?
+  leaseToken     String?
+  assignedAt     DateTime?
+  createdAt      DateTime @default(now())
+  lastError      String?
+  metric         Metric?
+  @@index([status, createdAt])
+  @@index([status, leaseExpiresAt])
+  @@index([nodeId, status])
+  @@index([jobId, status])
+}
+
+model Metric {
+  id              String   @id @default(uuid())
+  nodeId          String
+  node            Node     @relation(fields: [nodeId], references: [id])
+  jobId           String
+  job             Job      @relation(fields: [jobId], references: [id])
+  executionTimeMs Int
+  energyWh        Float
+  timestamp       DateTime @default(now())
+  taskId          String?  @unique
+  task            Task?    @relation(fields: [taskId], references: [id])
+}

@@ -1,0 +1,9 @@
+FROM python:3.12-slim
+WORKDIR /app
+COPY worker/requirements.txt /tmp/worker-requirements.txt
+COPY workloads/ai-inference/requirements.txt /tmp/inference-requirements.txt
+RUN pip install --no-cache-dir -r /tmp/worker-requirements.txt -r /tmp/inference-requirements.txt
+COPY worker/ ./worker/
+COPY workloads/ ./workloads/
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+CMD ["python", "worker/agent.py"]
