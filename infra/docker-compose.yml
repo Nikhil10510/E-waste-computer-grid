@@ -1,0 +1,105 @@
+name: ewaste-grid
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ewaste
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-development-only}
+      POSTGRES_DB: ewaste
+    ports:
+      - "127.0.0.1:${DB_PORT:-55432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ewaste -d ewaste"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  control-plane:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.control-plane
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${API_BIND_ADDRESS:-127.0.0.1}:${API_PORT:-8080}:8080"
+    environment:
+      DATABASE_URL: postgresql://ewaste:${POSTGRES_PASSWORD:-local-development-only}@db:5432/ewaste
+      PORT: 8080
+      ENROLLMENT_TOKEN: ${ENROLLMENT_TOKEN:-local-enrollment-change-me}
+      ALLOW_LEGACY_ENROLLMENT: ${ALLOW_LEGACY_ENROLLMENT:-true}
+      GRID_NAME: ${GRID_NAME:-E-Waste Compute Grid}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-local-admin-change-me}
+      STORAGE_SECRET: ${STORAGE_SECRET:-local-storage-signing-change-me}
+      STORAGE_DRIVER: local
+      STORAGE_DIR: /storage
+      PUBLIC_API_URL: ${PUBLIC_API_URL:-/api}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:4173}
+    volumes:
+      - object_data:/storage
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:8080/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.frontend
+    ports:
+      - "${FRONTEND_BIND_ADDRESS:-127.0.0.1}:${FRONTEND_PORT:-5173}:4173"
+    environment:
+      API_PROXY_TARGET: http://control-plane:8080
+    depends_on:
+      control-plane:
+        condition: service_healthy
+
+  # Containerized simulation workers use only the bundled workload scripts.
+  # Physical worker machines run worker/agent.py with EXECUTION_MODE=docker.
+  worker-1:
+    profiles: [simulation]
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.worker
+    restart: unless-stopped
+    environment:
+      CONTROL_PLANE_URL: http://control-plane:8080/api
+      ENROLLMENT_TOKEN: ${ENROLLMENT_TOKEN:-local-enrollment-change-me}
+      EXECUTION_MODE: native
+      DATA_DIR: /state
+      TEMP_EXEC_DIR: /tasks
+      WORKER_NAME: Demo worker 1
+    volumes:
+      - worker1_state:/state
+    depends_on:
+      control-plane:
+        condition: service_healthy
+  worker-2:
+    profiles: [simulation]
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.worker
+    restart: unless-stopped
+    environment:
+      CONTROL_PLANE_URL: http://control-plane:8080/api
+      ENROLLMENT_TOKEN: ${ENROLLMENT_TOKEN:-local-enrollment-change-me}
+      EXECUTION_MODE: native
+      DATA_DIR: /state
+      TEMP_EXEC_DIR: /tasks
+      WORKER_NAME: Demo worker 2
+    volumes:
+      - worker2_state:/state
+    depends_on:
+      control-plane:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  object_data:
+  worker1_state:
+  worker2_state:

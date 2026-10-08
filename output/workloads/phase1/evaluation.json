@@ -1,0 +1,107 @@
+{
+  "scope": "Local native runtime; ten photo integration demo, not a representative accuracy benchmark.",
+  "items_processed": 10,
+  "scored_images": 5,
+  "label_matches": 2,
+  "excluded_from_label_score": 5,
+  "model_sha256": "c0c3f76d93fa3fd6580652a45618618a220fced18babf65774ed169de0432ad5",
+  "predictions": [
+    {
+      "image": "chelsea.png",
+      "subject": "Domestic cat",
+      "expected_labels": [
+        "tabby",
+        "tiger cat",
+        "Egyptian cat"
+      ],
+      "prediction": "Egyptian cat",
+      "confidence": 0.7451,
+      "label_match": true
+    },
+    {
+      "image": "coffee.png",
+      "subject": "Coffee cup",
+      "expected_labels": [
+        "espresso",
+        "cup",
+        "coffee mug"
+      ],
+      "prediction": "espresso",
+      "confidence": 0.9907,
+      "label_match": true
+    },
+    {
+      "image": "brick.png",
+      "subject": "Brick wall",
+      "expected_labels": [
+        "stone wall"
+      ],
+      "prediction": "solar dish",
+      "confidence": 0.2362,
+      "label_match": false
+    },
+    {
+      "image": "camera.png",
+      "subject": "Person with camera",
+      "expected_labels": [],
+      "prediction": "tripod",
+      "confidence": 0.9972,
+      "label_match": null
+    },
+    {
+      "image": "astronaut.png",
+      "subject": "Astronaut portrait",
+      "expected_labels": [],
+      "prediction": "bobsled",
+      "confidence": 0.3044,
+      "label_match": null
+    },
+    {
+      "image": "coins.png",
+      "subject": "Coins",
+      "expected_labels": [],
+      "prediction": "cucumber",
+      "confidence": 0.6825,
+      "label_match": null
+    },
+    {
+      "image": "grass.png",
+      "subject": "Grass texture",
+      "expected_labels": [],
+      "prediction": "armadillo",
+      "confidence": 0.073,
+      "label_match": null
+    },
+    {
+      "image": "gravel.png",
+      "subject": "Gravel texture",
+      "expected_labels": [],
+      "prediction": "dishrag",
+      "confidence": 0.4859,
+      "label_match": null
+    },
+    {
+      "image": "clock_motion.png",
+      "subject": "Wall clock",
+      "expected_labels": [
+        "wall clock",
+        "analog clock"
+      ],
+      "prediction": "spotlight",
+      "confidence": 0.8267,
+      "label_match": false
+    },
+    {
+      "image": "rocket.jpg",
+      "subject": "Rocket launch",
+      "expected_labels": [
+        "missile",
+        "projectile",
+        "space shuttle"
+      ],
+      "prediction": "obelisk",
+      "confidence": 0.4951,
+      "label_match": false
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-09",
+  "scope": "Pairing/approval API foundation and existing agent reconnect/revocation; desktop popup and installer remain pending",
+  "backend_tests": {"passed": 27, "failed": 0, "skipped": 0, "postgresql_http_cases": 20},
+  "worker_tests": {"passed": 16, "failed": 0},
+  "frontend_build": "passed",
+  "frontend_lint": "passed",
+  "additive_upgrade_existing_worker_retained": true,
+  "local_compose_project": "ewaste-phase2",
+  "local_api_port": 18080,
+  "local_dashboard_port": 15173,
+  "local_api_health": "ok",
+  "dashboard_proxy_health": "ok",
+  "protected_pairing_route_status_without_credentials": 401,
+  "existing_demo_before_upgrade": {"nodes": 1, "jobs": 1, "tasks": 2, "metrics": 2},
+  "existing_demo_after_upgrade": {"nodes": 1, "jobs": 1, "tasks": 2, "metrics": 2},
+  "aws_updated": false,
+  "separate_physical_laptop_onboarding_verified": false
+}

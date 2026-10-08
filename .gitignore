@@ -1,0 +1,15 @@
+**/node_modules/
+**/dist/
+**/__pycache__/
+**/*.pyc
+**/.env
+**/.env.*
+!**/.env.example
+**/.worker_data/
+**/.task_exec/
+**/.storage/
+.venv/
+.venv-local/
+.test-data/
+*.log
+infra/.env

@@ -1,0 +1,105 @@
+{
+  "dataset_version": 1,
+  "source_version": "scikit-image v0.25.2",
+  "purpose": "Ten genuine photographic inputs for integration; not a representative accuracy benchmark.",
+  "source_documentation": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/_fetchers.py",
+  "images": [
+    {
+      "filename": "chelsea.png",
+      "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/chelsea.png",
+      "sha256": "596aa1e7cb875eb79f437e310381d26b338a81c2da23439704a73c4651e8c4bb",
+      "subject": "Domestic cat",
+      "expected_labels": [
+        "tabby",
+        "tiger cat",
+        "Egyptian cat"
+      ],
+      "license_note": "CC0 per upstream documentation"
+    },
+    {
+      "filename": "coffee.png",
+      "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/coffee.png",
+      "sha256": "cc02f8ca188b167c775a7101b5d767d1e71792cf762c33d6fa15a4599b5a8de7",
+      "subject": "Coffee cup",
+      "expected_labels": [
+        "espresso",
+        "cup",
+        "coffee mug"
+      ],
+      "license_note": "CC0 per upstream documentation"
+    },
+    {
+      "filename": "brick.png",
+      "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/brick.png",
+      "sha256": "7966caf324f6ba843118d98f7a07746d22f6a343430add0233eca5f6eaaa8fcf",
+      "subject": "Brick wall",
+      "expected_labels": [
+        "stone wall"
+      ],
+      "license_note": "CC0 per upstream documentation"
+    },
+    {
+      "filename": "camera.png",
+      "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/camera.png",
+      "sha256": "b0793d2adda0fa6ae899c03989482bff9a42d3d5690fc7e3648f2795d730c23a",
+      "subject": "Person with camera",
+      "expected_labels": [],
+      "license_note": "CC0 per upstream documentation"
+    },
+    {
+      "filename": "astronaut.png",
+      "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/astronaut.png",
+      "sha256": "88431cd9653ccd539741b555fb0a46b61558b301d4110412b5bc28b5e3ea6cb5",
+      "subject": "Astronaut portrait",
+      "expected_labels": [],
+      "license_note": "Public domain per upstream documentation"
+    },
+    {
+      "filename": "coins.png",
+      "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/coins.png",
+      "sha256": "f8d773fc9cfa6f4d8e5942dc34d0a0788fcaed2a4fefbbed0aef5398d7ef4cba",
+      "subject": "Coins",
+      "expected_labels": [],
+      "license_note": "No known copyright restrictions per upstream documentation"
+    },
+    {
+      "filename": "grass.png",
+      "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/grass.png",
+      "sha256": "b6b6022426b38936c43a4ac09635cd78af074e90f42ffa8227ac8b7452d39f89",
+      "subject": "Grass texture",
+      "expected_labels": [],
+      "license_note": "CC0 per upstream documentation"
+    },
+    {
+      "filename": "gravel.png",
+      "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/gravel.png",
+      "sha256": "c48615b451bf1e606fbd72c0aa9f8cc0f068ab7111ef7d93bb9b0f2586440c12",
+      "subject": "Gravel texture",
+      "expected_labels": [],
+      "license_note": "CC0 per upstream documentation"
+    },
+    {
+      "filename": "clock_motion.png",
+      "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/clock_motion.png",
+      "sha256": "f029226b28b642e80113d86622e9b215ee067a0966feaf5e60604a1e05733955",
+      "subject": "Wall clock",
+      "expected_labels": [
+        "wall clock",
+        "analog clock"
+      ],
+      "license_note": "Public domain per upstream documentation"
+    },
+    {
+      "filename": "rocket.jpg",
+      "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.25.2/skimage/data/rocket.jpg",
+      "sha256": "c2dd0de7c538df8d111e479619b129464d0269d0ae5fd18ca91d33a7fdfea95c",
+      "subject": "Rocket launch",
+      "expected_labels": [
+        "missile",
+        "projectile",
+        "space shuttle"
+      ],
+      "license_note": "Public domain per upstream documentation"
+    }
+  ]
+}

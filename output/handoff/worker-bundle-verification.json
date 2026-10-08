@@ -1,0 +1,6 @@
+{
+  "archive": "E_Waste_Phase_2_Windows_Worker.zip",
+  "source_files": 22,
+  "sha256": "e5b30f1c7db606d8a428566f2a034fef1e1f74bd7dd2d1d58a321cd3f4c6be3c",
+  "scope": "Worker-only source handoff; excludes credentials, environments and Git history."
+}

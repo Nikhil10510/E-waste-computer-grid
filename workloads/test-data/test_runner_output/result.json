@@ -1,0 +1,48 @@
+{
+  "status": "SUCCESS",
+  "itemsProcessed": 5,
+  "itemsFailed": 0,
+  "executionTimeMs": 514,
+  "startupTimeMs": 346,
+  "inferenceTimeMs": 167,
+  "predictions": [
+    {
+      "image": "car.jpg",
+      "classId": 549,
+      "className": "envelope",
+      "confidence": 0.1651
+    },
+    {
+      "image": "cat.jpg",
+      "classId": 549,
+      "className": "envelope",
+      "confidence": 0.151
+    },
+    {
+      "image": "dog.png",
+      "classId": 549,
+      "className": "envelope",
+      "confidence": 0.0898
+    },
+    {
+      "image": "flower.png",
+      "classId": 549,
+      "className": "envelope",
+      "confidence": 0.4201
+    },
+    {
+      "image": "mug.jpg",
+      "classId": 549,
+      "className": "envelope",
+      "confidence": 0.2051
+    }
+  ],
+  "errors": [],
+  "summary": {
+    "totalImages": 5,
+    "successfulInferences": 5,
+    "failedInferences": 0,
+    "averageConfidence": 0.2062,
+    "imagesPerSecond": 29.94
+  }
+}

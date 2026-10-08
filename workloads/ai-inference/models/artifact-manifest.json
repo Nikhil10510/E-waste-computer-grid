@@ -1,0 +1,8 @@
+{
+  "model_filename": "mobilenetv2-12.onnx",
+  "model_sha256": "c0c3f76d93fa3fd6580652a45618618a220fced18babf65774ed169de0432ad5",
+  "labels_filename": "imagenet_labels.json",
+  "labels_sha256": "c90a1e2912daeb377be590178861fe52e0f9e40b51833cca64a3a950fb8fdd18",
+  "labels_hash_normalization": "CRLF to LF",
+  "class_count": 1000
+}

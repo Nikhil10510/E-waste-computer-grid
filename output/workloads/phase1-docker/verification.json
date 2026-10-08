@@ -1,0 +1,25 @@
+{
+  "scope": "One-host Docker workload execution through TaskExecutor; not a physical fleet or browser test.",
+  "mode": "docker",
+  "capabilities": [
+    "dummy",
+    "image_inference"
+  ],
+  "preflight_errors": {},
+  "image_ids": {
+    "dummy": "sha256:d121e1d4507b428d4493bba24123c5005f979c545b2b1e754de5887f0f9ec075",
+    "image_inference": "sha256:7b36126880e510bdbd0117b3ab784cb4a41e3267df29f91877ff02b5c28217f7"
+  },
+  "items_processed": 10,
+  "items_failed": 0,
+  "exact_input_coverage": true,
+  "native_class_ids_match": true,
+  "execution_time_ms": 1954,
+  "limits": {
+    "network_disabled": true,
+    "read_only_root": true,
+    "memory": "2g",
+    "cpus": 2,
+    "pids": 128
+  }
+}

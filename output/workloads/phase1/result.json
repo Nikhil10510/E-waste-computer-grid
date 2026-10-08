@@ -1,0 +1,78 @@
+{
+  "status": "SUCCESS",
+  "itemsProcessed": 10,
+  "itemsFailed": 0,
+  "executionTimeMs": 426,
+  "startupTimeMs": 221,
+  "inferenceTimeMs": 204,
+  "predictions": [
+    {
+      "image": "astronaut.png",
+      "classId": 450,
+      "className": "bobsled",
+      "confidence": 0.3044
+    },
+    {
+      "image": "brick.png",
+      "classId": 807,
+      "className": "solar dish",
+      "confidence": 0.2362
+    },
+    {
+      "image": "camera.png",
+      "classId": 872,
+      "className": "tripod",
+      "confidence": 0.9972
+    },
+    {
+      "image": "chelsea.png",
+      "classId": 285,
+      "className": "Egyptian cat",
+      "confidence": 0.7451
+    },
+    {
+      "image": "clock_motion.png",
+      "classId": 818,
+      "className": "spotlight",
+      "confidence": 0.8267
+    },
+    {
+      "image": "coffee.png",
+      "classId": 967,
+      "className": "espresso",
+      "confidence": 0.9907
+    },
+    {
+      "image": "coins.png",
+      "classId": 943,
+      "className": "cucumber",
+      "confidence": 0.6825
+    },
+    {
+      "image": "grass.png",
+      "classId": 363,
+      "className": "armadillo",
+      "confidence": 0.073
+    },
+    {
+      "image": "gravel.png",
+      "classId": 533,
+      "className": "dishrag",
+      "confidence": 0.4859
+    },
+    {
+      "image": "rocket.jpg",
+      "classId": 682,
+      "className": "obelisk",
+      "confidence": 0.4951
+    }
+  ],
+  "errors": [],
+  "summary": {
+    "totalImages": 10,
+    "successfulInferences": 10,
+    "failedInferences": 0,
+    "averageConfidence": 0.5837,
+    "imagesPerSecond": 49.02
+  }
+}

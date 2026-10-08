@@ -1,0 +1,49 @@
+{
+  "job": {
+    "id": "2a34f804-a3ea-4ead-80bf-6888157f0408",
+    "name": "Phase 2 local Docker — ten photos",
+    "status": "COMPLETED",
+    "totalTasks": 2,
+    "completedTasks": 2,
+    "failedTasks": 0,
+    "createdAt": "2026-10-08T18:52:47.224Z",
+    "completedAt": "2026-10-08T18:55:19.864Z",
+    "tasks": [
+      {
+        "id": "2379b256-5d7f-4d87-9780-af7eb0280058",
+        "status": "COMPLETED",
+        "nodeId": "d1aa0208-2a8b-4b8f-8365-93675cd2fdd8",
+        "retryCount": 0
+      },
+      {
+        "id": "69b3e4bd-0c47-4174-ad13-13f8c097abd4",
+        "status": "COMPLETED",
+        "nodeId": "d1aa0208-2a8b-4b8f-8365-93675cd2fdd8",
+        "retryCount": 0
+      }
+    ],
+    "metrics": [
+      {
+        "taskId": "2379b256-5d7f-4d87-9780-af7eb0280058",
+        "executionTimeMs": 1766,
+        "energyWh": 0.06377222222222222
+      },
+      {
+        "taskId": "69b3e4bd-0c47-4174-ad13-13f8c097abd4",
+        "executionTimeMs": 1641,
+        "energyWh": 0.05925833333333334
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "d1aa0208-2a8b-4b8f-8365-93675cd2fdd8",
+      "name": "Local Docker rehearsal",
+      "os": "windows",
+      "capabilities": [
+        "dummy",
+        "image_inference"
+      ]
+    }
+  ]
+}

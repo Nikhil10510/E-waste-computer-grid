@@ -1,0 +1,78 @@
+{
+  "status": "SUCCESS",
+  "itemsProcessed": 10,
+  "itemsFailed": 0,
+  "executionTimeMs": 410,
+  "startupTimeMs": 252,
+  "inferenceTimeMs": 157,
+  "predictions": [
+    {
+      "image": "airliner.jpg",
+      "classId": 21,
+      "className": "kite",
+      "confidence": 0.0667
+    },
+    {
+      "image": "car.jpg",
+      "classId": 549,
+      "className": "envelope",
+      "confidence": 0.1651
+    },
+    {
+      "image": "cat.jpg",
+      "classId": 549,
+      "className": "envelope",
+      "confidence": 0.151
+    },
+    {
+      "image": "coffee_mug.jpg",
+      "classId": 21,
+      "className": "kite",
+      "confidence": 0.0667
+    },
+    {
+      "image": "dog.png",
+      "classId": 549,
+      "className": "envelope",
+      "confidence": 0.0898
+    },
+    {
+      "image": "flower.png",
+      "classId": 549,
+      "className": "envelope",
+      "confidence": 0.4201
+    },
+    {
+      "image": "golden_retriever.jpg",
+      "classId": 21,
+      "className": "kite",
+      "confidence": 0.0667
+    },
+    {
+      "image": "mug.jpg",
+      "classId": 549,
+      "className": "envelope",
+      "confidence": 0.2051
+    },
+    {
+      "image": "sports_car.jpg",
+      "classId": 21,
+      "className": "kite",
+      "confidence": 0.0667
+    },
+    {
+      "image": "tabby_cat.jpg",
+      "classId": 21,
+      "className": "kite",
+      "confidence": 0.0667
+    }
+  ],
+  "errors": [],
+  "summary": {
+    "totalImages": 10,
+    "successfulInferences": 10,
+    "failedInferences": 0,
+    "averageConfidence": 0.1365,
+    "imagesPerSecond": 63.69
+  }
+}
