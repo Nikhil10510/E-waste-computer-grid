@@ -6,6 +6,7 @@ from datetime import datetime
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+from pathlib import Path
 import random
 import signal
 import threading
@@ -215,12 +216,19 @@ if __name__ == "__main__":
     args = parser.parse_args()
     Config.setup_dirs()
     if args.preflight:
+        preflight_cancel = threading.Event()
+        stop_path = os.getenv('EWASTE_PREFLIGHT_STOP_FILE')
+        def watch_preflight_stop():
+            while not preflight_cancel.wait(0.1):
+                if stop_path and Path(stop_path).exists(): preflight_cancel.set()
+        if stop_path: threading.Thread(target=watch_preflight_stop, daemon=True).start()
         try:
             executor = TaskExecutor()
-            capabilities = executor.capabilities()
+            capabilities = executor.capabilities(preflight_cancel)
             print(json.dumps({"mode": Config.EXECUTION_MODE, "capabilities": capabilities,
                               "errors": executor.preflight_errors}, indent=2))
-            sys.exit(0 if "image_inference" in capabilities else 1)
+            ready = set(capabilities) == set(Config.RELEASE.images) if Config.RELEASE else 'image_inference' in capabilities
+            sys.exit(0 if ready else 1)
         except Exception as error:
             print(json.dumps({"mode": Config.EXECUTION_MODE, "error": str(error)}))
             sys.exit(1)

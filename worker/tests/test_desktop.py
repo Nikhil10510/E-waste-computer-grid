@@ -100,6 +100,44 @@ class DesktopTests(unittest.TestCase):
         self.spawn.assert_not_called()
         self.assertFalse((Path(self.temp.name) / 'credentials.json').exists())
 
+    def test_import_progress_does_not_finish_background_work_or_enroll(self):
+        entered, release = threading.Event(), threading.Event()
+        def prepare(runtime, archive, cancel, progress):
+            progress('Verifying offline archive: 50%'); entered.set()
+            release.wait(3)
+            return ['dummy', 'image_inference']
+        with patch('desktop_runtime.DesktopRuntime.prepare_images', prepare):
+            self.window.import_runtime('reviewed.tar')
+            self.until(entered.is_set)
+            self.until(lambda: self.window.status.get() == 'Verifying offline archive: 50%')
+            self.assertTrue(self.window.busy)
+            self.assertIsNone(self.window.client)
+            self.spawn.assert_not_called()
+            release.set(); self.until(lambda: not self.window.busy)
+        self.assertIn('passed real preflight', self.window.status.get())
+
+    def test_close_cancels_background_import_without_starting_compute(self):
+        entered = threading.Event()
+        def prepare(runtime, archive, cancel, progress):
+            entered.set(); cancel.wait(3)
+            from runtime_release import PreparationCancelled
+            raise PreparationCancelled('cancelled')
+        with patch('desktop_runtime.DesktopRuntime.prepare_images', prepare):
+            self.window.import_runtime('reviewed.tar'); self.until(entered.is_set)
+            self.window.finish_close = MagicMock()
+            self.window.close()
+            self.until(lambda: self.window.finish_close.called)
+        self.assertTrue(self.window.preparation_cancel.is_set())
+        self.spawn.assert_not_called(); self.assertIsNone(self.window.client)
+
+    def test_cancelled_archive_picker_does_not_lock_the_wrong_grid(self):
+        with patch('desktop.filedialog.askopenfilename', return_value=''):
+            self.window.import_runtime()
+        self.assertIsNone(self.window.lock_context)
+        self.assertIsNone(self.window.runtime)
+        self.assertFalse(self.window.busy)
+        self.assertEqual(str(self.window.address['state']), 'normal')
+
     def test_expired_session_can_prepare_a_new_code_without_starting_compute(self):
         self.prepare(); self.invite()
         self.window.events.put(('poll', None, APIError('Pairing session expired', 410)))

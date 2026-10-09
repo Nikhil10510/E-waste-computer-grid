@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-10",
+  "status": "Offline distribution implemented; local acceptance passed; separate-laptop preflight user-reported; final separate-laptop job evidence pending",
+  "source_base_commit": "a14f60451edddc865e216ff042f45c1f079627bd",
+  "source_state": "Step 5 changes are local and uncommitted at this checkpoint",
+  "scope": "Offline source preview, Windows protected state and real local Docker/HTTP/PostgreSQL acceptance. No native desktop inspection or control was used in this step.",
+  "checks": {
+    "worker_tests_passed": 84,
+    "worker_tests_skipped": 0,
+    "backend_tests_passed": 33,
+    "backend_tests_skipped": 0,
+    "backend_build": "passed",
+    "workload_tests_passed": 32,
+    "frontend_build_lint": "not repeated; frontend source unchanged",
+    "trusted_manifest_and_fail_closed_missing_manifest": "passed",
+    "archive_corruption_size_disk_mode_platform_failures": "passed mocked boundary tests",
+    "snapshot_hash_prevents_original_file_change_race": "passed",
+    "import_and_preflight_cancellation": "passed mocked process/Tk callbacks",
+    "cooperative_preflight_cleanup_failure_fallback": "passed mocked process tests",
+    "progress_keeps_ui_busy_and_no_enrollment": "passed hidden Tk tests",
+    "saved_cli_context_cannot_redirect_import": "passed",
+    "actual_archive_export_and_import": "passed local Docker",
+    "immutable_image_execution": "passed through real agent preflight and image tasks",
+    "real_job": "ten photos, two completed tasks, ten predictions, zero failures, exact identities and two metrics",
+    "actual_job_container_limits": "one CPU equivalent, 2 GiB RAM, no additional swap, read-only root and disabled container network",
+    "cleanup": "isolated API/schema stopped/dropped; zero owned containers after agent stop; shared demo/runtime retained",
+    "desktop_source_bundle": "14 allowlisted files plus instructions/checksums; ZIP integrity verified"
+  },
+  "release": {
+    "name": "team-offline-v1",
+    "platform": "linux/amd64",
+    "archive_bytes": 112585728,
+    "archive_sha256": "8f64f8996415c264aa7d144518b1338b4d67878d1be1119992f889fe85e0bdbf",
+    "dummy_image_id": "sha256:d121e1d4507b428d4493bba24123c5005f979c545b2b1e754de5887f0f9ec075",
+    "inference_image_id": "sha256:7b36126880e510bdbd0117b3ab784cb4a41e3267df29f91877ff02b5c28217f7",
+    "digest_kind": "Docker image ID, not registry manifest digest",
+    "registry_published": false
+  },
+  "external_device": {
+    "os": "Windows, reported earlier by user",
+    "preflight": "User reported: Approved images passed real preflight",
+    "observed_by_this_agent": false,
+    "fresh_empty_image_store_proven": false,
+    "approved_job_owner_and_results": "pending user response",
+    "runtime_versions": "not yet supplied",
+    "source_bundle_boundary": "User tested the initial Step 5 preview; final bundle includes additional fail-closed/cancellation hardening with the same image release"
+  },
+  "evidence": ["step5-acceptance.md", "step5-docker-verification.json", "step5-job-results.json"],
+  "remaining": ["Record approved job ownership/results on separate laptop", "Step 6 installer/tray/optional startup and clean-machine packaging", "Step 7 physical reboot and multi-device recovery", "Release publication/clean-clone/CI proof"],
+  "installer_created": false,
+  "aws_updated": false,
+  "remote_pushed": false
+}

@@ -82,7 +82,7 @@ separate-laptop acceptance remain pending. See
 Upgrade the backend before using the updated worker with a saved identity.
 The script flow below remains enabled for local development.
 
-Desktop preview (Python with Tkinter and prepared Docker images required):
+Desktop preview (Python with Tkinter and running Linux/amd64 Docker required):
 
 ```powershell
 .\.venv-local\Scripts\python.exe worker\desktop.py --api-url http://localhost:8080/api --allow-http
@@ -95,6 +95,13 @@ Step 4 adds protected Windows credentials/settings, persistent controls and
 redacted diagnostics. Saved pause remains in effect after restart. Disconnect
 stops the owned worker before changing grids and retains its identity. See
 [Step 4 acceptance](output/onboarding/step4-acceptance.md) for local test scope.
+
+Step 5 adds **Import offline workloads**: select the team's separately copied
+`images.tar`, verify its checksum/image identities, then run real preflight.
+The desktop executes the reviewed release's immutable image IDs, with no manual
+workload build needed on a receiving laptop. Python/Docker remain prerequisites.
+See [offline setup and current evidence](docs/OFFLINE_RUNTIME.md). The large
+archive is ignored by Git; the source manifest and setup tools are included.
 
 Use the matching enrollment token from your API's configuration:
 

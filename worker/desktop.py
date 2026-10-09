@@ -6,7 +6,7 @@ from pathlib import Path
 import queue
 import threading
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 from tkinter.scrolledtext import ScrolledText
 from api_client import APIError
 from desktop_runtime import DesktopRuntime
@@ -62,6 +62,8 @@ class WorkerWindow:
         self.starting = False
         self.stop_after_start = False
         self.threads = []
+        self.preparation_cancel = threading.Event()
+        self.preparing_runtime = False
         root.title('E-Waste Grid Worker')
         root.geometry('740x650'); root.minsize(520, 440)
         root.protocol('WM_DELETE_WINDOW', self.close)
@@ -124,6 +126,11 @@ class WorkerWindow:
         self.memory_input = ttk.Spinbox(memory_row, from_=0.25, to=hardware['ram_gb'], increment=0.25, width=7, textvariable=self.memory_value)
         self.memory_input.pack(side='left', padx=8)
         self.prepare_button = ttk.Button(panel, text='Prepare connection', command=self.prepare); self.prepare_button.pack(anchor='w')
+        runtime_row = ttk.Frame(panel); runtime_row.pack(fill='x', pady=(8, 0))
+        self.import_button = ttk.Button(runtime_row, text='Import offline workloads', command=self.import_runtime)
+        self.import_button.pack(side='left')
+        self.cancel_import_button = ttk.Button(runtime_row, text='Cancel preparation', command=self.cancel_preparation, state='disabled')
+        self.cancel_import_button.pack(side='left', padx=6)
         ttk.Separator(panel).pack(fill='x', pady=17)
         self.code = tk.StringVar(value='No pairing code yet')
         ttk.Label(panel, text='Share only this code with the grid administrator:').pack(anchor='w')
@@ -158,6 +165,7 @@ class WorkerWindow:
         if self.busy or self.closing: return
         self.busy = True
         self.prepare_button.configure(state='disabled')
+        self.import_button.configure(state='disabled')
         self.retry_button.configure(state='disabled')
         self.pause_button.configure(state='disabled')
         for button in self.popup_buttons: button.configure(state='disabled')
@@ -167,6 +175,40 @@ class WorkerWindow:
             except Exception as error: events.put((name, None, error))
         thread = threading.Thread(target=run, daemon=True)
         self.threads.append(thread); thread.start()
+
+    def import_runtime(self, archive=None):
+        if self.busy or self.closing: return
+        if self.runtime and self.runtime.running():
+            self.status.set('Stop the worker before preparing workload images.'); return
+        try:
+            if archive is None:
+                archive = filedialog.askopenfilename(parent=self.root, title='Select the reviewed team image archive',
+                    filetypes=[('Docker image archive', '*.tar')])
+            if not archive: return
+            url = normalize_api_url(self.url.get(), self.allow_http.get())
+            hardware = get_hardware_specs(['dummy'])
+            limits = validate_limits({'cpu': float(self.cpu_value.get()), 'memory_gb': float(self.memory_value.get())},
+                hardware['cpu_cores'], hardware['ram_gb'])
+            directory = Path(self.directory_override) if self.directory_override else state_directory(url)
+            if self.lock_context is None:
+                self.lock_context = desktop_lock(directory)
+                try: self.lock_context.__enter__()
+                except Exception: self.lock_context = None; raise
+            self.address.configure(state='disabled'); self.http_box.configure(state='disabled')
+            # Reuse a selected runtime/approval; importing never enrolls a node.
+            runtime = self.runtime or DesktopRuntime(url, directory, self.name.get().strip(), limits)
+            self.runtime = runtime
+            self.preparation_cancel.clear(); self.preparing_runtime = True
+            self.cancel_import_button.configure(state='normal')
+            self.status.set('Checking Docker and verifying the offline release...')
+            events = self.events
+            self.background('runtime', lambda: runtime.prepare_images(archive, self.preparation_cancel,
+                lambda message: events.put(('runtime-progress', message, None))))
+        except Exception as error: self.status.set(safe_text(error))
+
+    def cancel_preparation(self):
+        self.preparation_cancel.set()
+        self.status.set('Cancelling runtime preparation. Docker may retain imported content; no worker will start.')
 
     def prepare(self):
         if self.busy or self.closing: return
@@ -310,6 +352,7 @@ class WorkerWindow:
 
     def close(self):
         self.closing = True
+        self.preparation_cancel.set()
         self.hide_invitation()
         if self.runtime and self.runtime.running(): self.stop()
         elif self.busy: self.status.set('Closing safely. Waiting for the current runtime check or network request...')
@@ -334,7 +377,15 @@ class WorkerWindow:
         try:
             while True:
                 name, result, error = self.events.get_nowait()
+                if name == 'runtime-progress':
+                    if not self.preparation_cancel.is_set(): self.status.set(result)
+                    continue
                 self.busy = False
+                if name == 'runtime':
+                    self.preparing_runtime = False
+                    self.cancel_import_button.configure(state='disabled')
+                    self.prepare_button.configure(state='normal' if not self.approved else 'disabled')
+                self.import_button.configure(state='normal')
                 for button in self.popup_buttons: button.configure(state='normal')
                 if error:
                     if name == 'start':
@@ -371,6 +422,8 @@ class WorkerWindow:
                         self.retry_button.configure(state='normal')
                         self.schedule_poll(100)
                         self.connection.set('Waiting for administrator invitation')
+                elif name == 'runtime':
+                    self.status.set('Approved images passed real preflight. Prepare connection to request owner-approved participation.')
                 elif name == 'poll':
                     state = result['state']; self.poll_delay = 3000
                     if state == 'INVITED':

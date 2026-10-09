@@ -12,4 +12,5 @@
 .venv-local/
 .test-data/
 *.log
+output/runtime/
 infra/.env

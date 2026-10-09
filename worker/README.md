@@ -64,6 +64,14 @@ Never copy credentials between workers. On one machine, assign each agent
 different `DATA_DIR` and `TEMP_EXEC_DIR`; `--once` processes at most one assignment
 for controlled integration tests. Stop with Ctrl+C.
 
+## Verified offline runtime distribution
+
+The owner desktop now uses the trusted `releases/current.json` and immutable
+image IDs. Click **Import offline workloads** to verify/load the team's
+`images.tar` and run real preflight before pairing. No worker starts merely
+because images were prepared. Python/Docker remain prerequisites; no installer
+or autostart is added. See [offline setup](../docs/OFFLINE_RUNTIME.md).
+
 ## Verify
 
 ```powershell

@@ -1,5 +1,15 @@
 # Worker onboarding implementation
 
+## Current checkpoint - 10 October 2026
+
+Steps 1-4 passed their local acceptance gates. Step 5 offline distribution is
+implemented and has local import/pinned-Docker job evidence. The user reports
+real preflight passed on the separate Windows laptop; its approved job ownership
+and downloaded results are the remaining final check. See
+[offline runtime setup and boundaries](OFFLINE_RUNTIME.md) and
+`output/onboarding/step5-verification.json`. Earlier sections retain their dated
+checkpoint claims. Installer/startup and physical recovery remain Steps 6-7.
+
 ## Step 1 — pairing and approval backend
 
 Implemented locally: expiring pairing sessions, authenticated invitations,

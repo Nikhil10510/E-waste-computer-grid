@@ -25,6 +25,13 @@ class Config:
         "dummy": os.getenv("DUMMY_IMAGE", "ewaste/dummy-workload:v1"),
         "image_inference": os.getenv("INFERENCE_IMAGE", "ewaste/ai-workload:v1"),
     }
+    RELEASE = None
+    if os.getenv('WORKLOAD_RELEASE_MANIFEST'):
+        from runtime_release import OfflineRelease
+        RELEASE = OfflineRelease(os.environ['WORKLOAD_RELEASE_MANIFEST'])
+        if RELEASE.fingerprint != os.getenv('WORKLOAD_RELEASE_SHA256'):
+            raise ValueError('Runtime release changed after selection; prepare it again')
+        IMAGES = RELEASE.images.copy()
 
     @classmethod
     def setup_dirs(cls):

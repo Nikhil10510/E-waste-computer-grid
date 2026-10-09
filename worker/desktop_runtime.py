@@ -4,17 +4,19 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import uuid
 from resource_limits import validate_limits, memory_bytes
 from state_store import load_state
 from log_safety import safe_text
+from runtime_release import OfflineRelease, DEFAULT_MANIFEST, run_command
 
 AGENT_PATH = Path(__file__).with_name('agent.py')
 
 
-def worker_environment(api_url, directory, name, limits=None):
+def worker_environment(api_url, directory, name, limits=None, release=None):
     limits = validate_limits(limits or {'cpu': 2, 'memory_gb': 2})
     env = os.environ.copy()
-    for key in ('ADMIN_TOKEN', 'ENROLLMENT_TOKEN', 'STORAGE_SECRET', 'DATABASE_URL'):
+    for key in ('ADMIN_TOKEN', 'ENROLLMENT_TOKEN', 'STORAGE_SECRET', 'DATABASE_URL', 'WORKLOAD_RELEASE_MANIFEST', 'EWASTE_PREFLIGHT_STOP_FILE'):
         env.pop(key, None)
     env.update(CONTROL_PLANE_URL=api_url, DATA_DIR=str(directory), TEMP_EXEC_DIR=str(Path(directory) / 'tasks'),
         EXECUTION_MODE='docker', REQUIRE_PAIRED_IDENTITY='true', WORKER_NAME=name, PYTHONUTF8='1',
@@ -22,6 +24,11 @@ def worker_environment(api_url, directory, name, limits=None):
         MAX_POLL_INTERVAL='5',
         DUMMY_IMAGE='ewaste/dummy-workload:v1', INFERENCE_IMAGE='ewaste/ai-workload:v1')
     env['EWASTE_LOG_FILE'] = str(Path(directory) / 'agent.log')
+    if release:
+        env.update(DUMMY_IMAGE=release.images['dummy'], INFERENCE_IMAGE=release.images['image_inference'],
+            WORKLOAD_RELEASE_MANIFEST=str(release.path), WORKLOAD_RELEASE_SHA256=release.fingerprint)
+    else:
+        env.pop('WORKLOAD_RELEASE_SHA256', None)
     return env
 
 
@@ -35,12 +42,33 @@ class DesktopRuntime:
         self.preflight_log_file = self.directory / 'preflight.log'
         self.stop_file = self.directory / 'stop.request'
         self.limits = validate_limits(limits or {'cpu': 2, 'memory_gb': 2})
+        self.release = OfflineRelease(DEFAULT_MANIFEST)
 
-    def preflight(self):
-        completed = subprocess.run([sys.executable, str(AGENT_PATH), '--preflight'],
-            env=worker_environment(self.api_url, self.directory, self.name, self.limits),
-            capture_output=True, text=True, timeout=90,
-            creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
+    def prepare_images(self, archive, cancel, progress):
+        if self.running(): raise RuntimeError('Stop the worker before preparing a runtime release')
+        if not self.release: raise RuntimeError('No reviewed release is configured')
+        self.release.prepare(self.directory, archive, cancel, progress)
+        progress('Running approved workloads under your selected resource limits...')
+        return self.preflight(cancel)
+
+    def preflight(self, cancel=None):
+        environment = worker_environment(self.api_url, self.directory, self.name, self.limits, self.release)
+        if cancel is not None:
+            stop = self.directory / ('preflight-' + uuid.uuid4().hex + '.stop')
+            environment['EWASTE_PREFLIGHT_STOP_FILE'] = str(stop)
+            try:
+                stdout = run_command([sys.executable, str(AGENT_PATH), '--preflight'], cancel, timeout=90, env=environment,
+                    request_stop=lambda: stop.write_text('stop', encoding='ascii'))
+                completed = subprocess.CompletedProcess([], 0, stdout, '')
+            except Exception as error:
+                self.preflight_log_file.write_text(safe_text(error)[-16000:], encoding='utf-8')
+                raise
+            finally: stop.unlink(missing_ok=True)
+        else:
+            completed = subprocess.run([sys.executable, str(AGENT_PATH), '--preflight'],
+                env=environment,
+                capture_output=True, text=True, timeout=90,
+                creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
         diagnostic = safe_text(completed.stdout + '\n' + completed.stderr)[-16000:]
         self.preflight_log_file.write_text(diagnostic, encoding='utf-8')
         try: data = json.loads(completed.stdout)
@@ -63,7 +91,7 @@ class DesktopRuntime:
             self.log_file.replace(self.log_file.with_suffix('.log.1'))
         with self.log_file.open('ab') as stream:
             self.process = subprocess.Popen([sys.executable, str(AGENT_PATH)],
-                env=worker_environment(self.api_url, self.directory, self.name, self.limits), stdout=stream, stderr=subprocess.STDOUT,
+                env=worker_environment(self.api_url, self.directory, self.name, self.limits, self.release), stdout=stream, stderr=subprocess.STDOUT,
                 creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
 
     def request_stop(self):

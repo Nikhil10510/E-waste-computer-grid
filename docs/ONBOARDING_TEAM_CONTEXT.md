@@ -1,6 +1,13 @@
 # E-Waste Compute Grid - Team Context
 
-Snapshot: 2026-10-09. Generated from the current verification ledger.
+Historical snapshot: 2026-10-09. Latest update: 2026-10-10.
+
+Current Step 5 implementation/evidence supersedes the older planning paragraphs
+below: approved offline archive, trusted image-ID/checksum manifest, background
+preparation/cancellation, pinned real preflight and exact local Docker job output.
+The user reports preflight passed on a separate Windows laptop; its final approved
+job evidence is pending. Read docs/OFFLINE_RUNTIME.md and the Step 5 ledger first.
+Steps 6-7 remain open. Earlier PDFs and checkpoint counts remain historical.
 
 ## Project context and goals
 

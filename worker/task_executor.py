@@ -29,15 +29,21 @@ class TaskExecutor:
             self.docker_client = docker.from_env(timeout=15)
             self.docker_client.ping()
 
-    def capabilities(self):
+    def capabilities(self, cancel=None):
+        cancel = cancel or Event()
         capabilities = []
         self.preflight_errors = {}
         for kind in Config.IMAGES:
+            self.check_cancel(cancel)
             try:
                 if self.docker_client:
-                    self.docker_client.images.get(Config.IMAGES[kind])
-                self.verify_workload(kind)
+                    image = self.docker_client.images.get(Config.IMAGES[kind])
+                    if Config.RELEASE: Config.RELEASE.validate_image(kind, image)
+                self.check_cancel(cancel)
+                self.verify_workload(kind, cancel)
                 capabilities.append(kind)
+            except TaskCancelled:
+                raise
             except Exception as error:
                 self.preflight_errors[kind] = str(error)
                 logger.warning("Workload %s not advertised: preflight failed: %s", kind, error)
@@ -45,7 +51,7 @@ class TaskExecutor:
             raise RuntimeError("No approved workload passed runtime preflight")
         return capabilities
 
-    def verify_workload(self, kind):
+    def verify_workload(self, kind, cancel=None):
         # This tiny synthetic probe checks runtime health, not classification accuracy.
         with tempfile.TemporaryDirectory(prefix="preflight-", dir=Config.TEMP_EXEC_DIR) as temp:
             inputs, outputs = Path(temp) / "input", Path(temp) / "output"
@@ -56,7 +62,7 @@ class TaskExecutor:
             else:
                 (inputs / name).write_bytes(base64.b64decode(
                     "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFElEQVR4nGNg+M/wn4GB8T8DCAAAG/kC/0A9Dx0AAAAASUVORK5CYII="))
-            self.run_workload(kind, inputs, outputs, Event(), "preflight-" + os.urandom(8).hex(), preflight=True)
+            self.run_workload(kind, inputs, outputs, cancel or Event(), "preflight-" + os.urandom(8).hex(), preflight=True)
             result = json.loads((outputs / "result.json").read_text(encoding="utf-8"))
             predictions = result.get("predictions", [])
             if (result.get("status") != "SUCCESS" or result.get("itemsProcessed") != 1
@@ -107,6 +113,8 @@ class TaskExecutor:
         started = time.monotonic()
         timeout = min(Config.WORKLOAD_TIMEOUT, Config.PREFLIGHT_TIMEOUT) if preflight else Config.WORKLOAD_TIMEOUT
         if self.docker_client:
+            if Config.RELEASE:
+                Config.RELEASE.validate_image(kind, self.docker_client.images.get(Config.IMAGES[kind]))
             container = self.docker_client.containers.run(
                 Config.IMAGES[kind], detach=True,
                 environment={"PREFLIGHT": "1" if preflight else "0"},

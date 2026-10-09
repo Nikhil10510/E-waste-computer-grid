@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "result_version": 1,
+  "release": "team-offline-v1",
+  "platform": "linux/amd64",
+  "archive": {
+    "filename": "images.tar",
+    "bytes": 112585728,
+    "sha256": "8f64f8996415c264aa7d144518b1338b4d67878d1be1119992f889fe85e0bdbf"
+  },
+  "images": {
+    "dummy": {
+      "image_id": "sha256:d121e1d4507b428d4493bba24123c5005f979c545b2b1e754de5887f0f9ec075"
+    },
+    "image_inference": {
+      "image_id": "sha256:7b36126880e510bdbd0117b3ab784cb4a41e3267df29f91877ff02b5c28217f7",
+      "model_sha256": "c0c3f76d93fa3fd6580652a45618618a220fced18babf65774ed169de0432ad5",
+      "labels_sha256": "c90a1e2912daeb377be590178861fe52e0f9e40b51833cca64a3a950fb8fdd18"
+    }
+  }
+}
