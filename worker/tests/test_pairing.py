@@ -10,6 +10,7 @@ import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from api_client import APIClient, APIError
+from state_store import load_state
 from config import Config
 from pairing_client import PairingClient, normalize_api_url
 from desktop_runtime import DesktopRuntime, worker_environment
@@ -52,7 +53,7 @@ class PairingTests(unittest.TestCase):
                 recovered.decide(True)
             self.assertEqual(request.call_args.kwargs['headers']['Authorization'], 'Bearer ' + session['pairing_secret'])
             self.assertFalse(request.call_args.kwargs['allow_redirects'])
-            saved = json.loads(recovered.credentials_file.read_text())
+            saved = load_state(recovered.credentials_file)
             self.assertEqual(saved['node_id'], approved['node_id'])
             self.assertEqual(saved['control_plane_url'], client.api_url)
             self.assertIsNone(recovered.session); self.assertFalse(recovered.session_file.exists())
@@ -66,7 +67,7 @@ class PairingTests(unittest.TestCase):
                 with self.assertRaises(OSError): client.decide(True)
             self.assertTrue(client.session_file.exists()); self.assertIsNotNone(client.session)
             with patch('pairing_client.requests.request', return_value=reply(approved)): client.decide(True)
-            self.assertEqual(json.loads(client.credentials_file.read_text())['node_id'], approved['node_id'])
+            self.assertEqual(load_state(client.credentials_file)['node_id'], approved['node_id'])
 
     def test_decline_never_writes_worker_identity(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -125,7 +126,7 @@ class PairingTests(unittest.TestCase):
             with patch('pairing_client.requests.request', return_value=reply({**self.approved(), 'resource_limits': policy})) as request:
                 recovered.decide(True)
             self.assertEqual(request.call_args.kwargs['json']['resource_limits'], policy)
-            self.assertEqual(json.loads(recovered.credentials_file.read_text())['resource_limits'], policy)
+            self.assertEqual(load_state(recovered.credentials_file)['resource_limits'], policy)
 
     def test_custom_limits_reach_the_docker_worker_environment(self):
         env = worker_environment('https://grid.example/api', Path('state'), 'Laptop', {'cpu': 0.5, 'memory_gb': 0.75})

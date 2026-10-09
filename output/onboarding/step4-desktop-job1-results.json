@@ -1,0 +1,88 @@
+{
+  "job_id": "c5e41fc4-f1db-42fe-810f-10f671a1c478",
+  "name": "Step 4 desktop 1",
+  "status": "COMPLETED",
+  "total_tasks": 2,
+  "completed_tasks": 2,
+  "failed_tasks": 0,
+  "items_processed": 10,
+  "items_failed": 0,
+  "predictions": [
+    {
+      "image": "00000_astronaut.png",
+      "classId": 450,
+      "className": "bobsled",
+      "confidence": 0.3044,
+      "task_id": "4dcccaef-3f4a-4503-bcdc-8dd238d8951e"
+    },
+    {
+      "image": "00001_brick.png",
+      "classId": 807,
+      "className": "solar dish",
+      "confidence": 0.2362,
+      "task_id": "4dcccaef-3f4a-4503-bcdc-8dd238d8951e"
+    },
+    {
+      "image": "00002_camera.png",
+      "classId": 872,
+      "className": "tripod",
+      "confidence": 0.9972,
+      "task_id": "4dcccaef-3f4a-4503-bcdc-8dd238d8951e"
+    },
+    {
+      "image": "00003_chelsea.png",
+      "classId": 285,
+      "className": "Egyptian cat",
+      "confidence": 0.7451,
+      "task_id": "4dcccaef-3f4a-4503-bcdc-8dd238d8951e"
+    },
+    {
+      "image": "00004_clock_motion.png",
+      "classId": 818,
+      "className": "spotlight",
+      "confidence": 0.8267,
+      "task_id": "4dcccaef-3f4a-4503-bcdc-8dd238d8951e"
+    },
+    {
+      "image": "00005_coffee.png",
+      "classId": 967,
+      "className": "espresso",
+      "confidence": 0.9907,
+      "task_id": "2e4b3f20-123e-48bc-ba3d-422e99242dc2"
+    },
+    {
+      "image": "00006_coins.png",
+      "classId": 943,
+      "className": "cucumber",
+      "confidence": 0.6825,
+      "task_id": "2e4b3f20-123e-48bc-ba3d-422e99242dc2"
+    },
+    {
+      "image": "00007_grass.png",
+      "classId": 363,
+      "className": "armadillo",
+      "confidence": 0.073,
+      "task_id": "2e4b3f20-123e-48bc-ba3d-422e99242dc2"
+    },
+    {
+      "image": "00008_gravel.png",
+      "classId": 533,
+      "className": "dishrag",
+      "confidence": 0.4859,
+      "task_id": "2e4b3f20-123e-48bc-ba3d-422e99242dc2"
+    },
+    {
+      "image": "00009_rocket.jpg",
+      "classId": 682,
+      "className": "obelisk",
+      "confidence": 0.4951,
+      "task_id": "2e4b3f20-123e-48bc-ba3d-422e99242dc2"
+    }
+  ],
+  "errors": [],
+  "metrics": {
+    "estimated_energy_wh": 0.8050972222222221,
+    "execution_time_ms": 22295,
+    "metric_type": "ESTIMATED"
+  }
+}

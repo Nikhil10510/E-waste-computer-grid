@@ -4,6 +4,7 @@ import sys
 from contextlib import contextmanager
 from datetime import datetime
 import logging
+from logging.handlers import RotatingFileHandler
 import os
 import random
 import signal
@@ -14,6 +15,7 @@ from urllib.parse import urljoin
 from api_client import APIClient, APIError
 from config import Config
 from task_executor import TaskExecutor, TaskCancelled
+from log_safety import SafeFormatter
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -52,6 +54,10 @@ class WorkerAgent:
         self.active_task = None
         self.lease_deadline = 0.0
         self.api = APIClient()
+        if os.environ.get('EWASTE_LOG_FILE'):
+            handler = RotatingFileHandler(os.environ['EWASTE_LOG_FILE'], maxBytes=1024 * 1024, backupCount=2, encoding='utf-8')
+            handler.setFormatter(SafeFormatter(lambda: (self.api.node_secret, Config.ENROLLMENT_TOKEN)))
+            logging.getLogger().handlers = [handler]
         self.executor = TaskExecutor()
         self.executor.recover_containers()
         self.capabilities = self.executor.capabilities()
@@ -114,12 +120,24 @@ class WorkerAgent:
                 self.stop.wait(2)
         raise TaskCancelled('Worker stopped before result delivery finished')
 
+    def release_stopped_task(self, task):
+        # Give queued work back promptly after a local stop. The server checks
+        # the lease token, so a stale/revoked attempt cannot release another one.
+        try:
+            self.api.fail_task(task, 'Owner stopped the worker', retryable=True, attempts=1)
+        except APIError:
+            logger.warning('Stopped assignment could not be released; server lease recovery will handle it')
+
     def process_task(self, task):
         with self.lock:
-            if self.stop.is_set(): return
-            self.cancel.clear()
-            self.active_task = task
-            self.lease_deadline = datetime.fromisoformat(task["lease_expires_at"].replace("Z", "+00:00")).timestamp()
+            stopped = self.stop.is_set()
+            if not stopped:
+                self.cancel.clear()
+                self.active_task = task
+                self.lease_deadline = datetime.fromisoformat(task["lease_expires_at"].replace("Z", "+00:00")).timestamp()
+        if stopped:
+            self.release_stopped_task(task)
+            return
         logger.info("Executing task %s, attempt %s", task["task_id"], task["retry_count"])
         try:
             raw, duration = self.executor.execute_task(task, self.cancel)
@@ -127,6 +145,7 @@ class WorkerAgent:
             logger.info("Task %s completed", task["task_id"])
         except TaskCancelled as exc:
             logger.warning("%s", exc)
+            if self.stop.is_set(): self.release_stopped_task(task)
         except Exception as exc:
             logger.error("Task failed: %s", exc)
             try:
@@ -163,7 +182,9 @@ class WorkerAgent:
             while not self.stop.is_set():
                 try:
                     task = self.api.request_task()
-                    if self.stop.is_set(): break
+                    if self.stop.is_set():
+                        if task: self.release_stopped_task(task)
+                        break
                     if task:
                         self.process_task(task)
                         interval = Config.MIN_POLL_INTERVAL

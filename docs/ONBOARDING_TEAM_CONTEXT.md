@@ -18,7 +18,7 @@ Kushagra: backend and API contracts. Vaibhav: worker, Docker and installation. N
 
 ### Where this handoff applies
 
-Snapshot: 9 October 2026. Source workspace: D:/E-waste/E-waste. Paths in this document are relative to the repository so teammates can use their own checkout. This supplied directory has no canonical Git history or verified clean-clone release. Recover the team repository and agree on integration branches; do not invent a repository URL or treat the historical ZIP as the new installer.
+Snapshot: 9 October 2026. Onboarding Steps 1-4 and their local acceptance records are included in the team's repository on main. Paths below are relative to the repository so teammates can use their own checkout. The remaining-work handoff in output/pdf identifies the source checkpoint and provides an AI resumption prompt. A clean-clone packaged release remains unverified; the historical ZIP is not the new installer.
 
 ## Architecture and verified progress
 
@@ -40,7 +40,11 @@ Completed: expiring pairing sessions, administrator invitation, owner decision, 
 
 ### Onboarding step 2
 
-Source preview implemented; interactive approval/stop acceptance remains pending. See the verification section for tested scope.
+Completed locally: actual approval/decline, expiry, Docker computation, stop and full app restart under the same identity. See output/onboarding/step2-acceptance.md.
+
+### Onboarding steps 3–4
+
+Step 3 resource-policy acceptance passed local HTTP/Docker tests. Step 4 passed local desktop/protected-state acceptance: actual custom-limit approval, pause/resume, diagnostics, full app restart with encrypted identity/settings and disconnect. Two ten-photo jobs completed four tasks with exact coverage and zero failures. 61 worker tests and 33 backend tests passed, with zero backend skips. Steps 5–7 remain open. See output/onboarding/step4-acceptance.md for the tested boundary.
 
 ### Meaning of hardware values
 
@@ -72,15 +76,15 @@ WAITING -> INVITED -> APPROVED or DECLINED. Unfinished sessions expire after ten
 
 ### Step 2 - invitation and owner approval
 
-Kushagra + Vaibhav + Chinmay. The pairing client, dashboard invitation form and desktop window are now present in source. Finish interactive approval/stop/restart acceptance before declaring the step complete. Keep network/preflight work off the UI thread. Save approved credentials atomically, recover a lost response without another node, and never use a global admin/enrollment token on the laptop. Deliver a source-based end-to-end flow before packaging.
+Kushagra + Vaibhav + Chinmay. Completed locally; interactive approval/stop/restart and real Docker jobs passed. Preserve the private pairing protocol and owner consent when packaging.
 
 ### Step 3 - participation and resource policy
 
-Kushagra + Vaibhav. Validate and persist owner-selected CPU/RAM limits, enforce them in Docker, and make task admission respect effective capacity. Define pause as no new tasks while current work finishes; define stop as safe cancellation. Preserve pause on restart. Test concurrent assignment versus pause/revoke and exact once-only result acceptance.
+Kushagra + Vaibhav. Completed locally: frozen CPU/RAM consent, Docker quotas including zero additional swap, RAM admission, pause/drain, preserved pause and stop/retry. Concurrent assignment versus pause/revoke and duplicate accounting passed. The manual custom-limit approval gap was closed during Step 4.
 
 ### Step 4 - desktop reliability and credential protection
 
-Vaibhav + Chinmay. Complete responsive UI, connection state, errors/logs, settings persistence, protected Windows credential storage and clear stop/disconnect actions. Bind identity to the selected grid. Verify shutdown during download/execution/reporting. A GUI source file is not an installer or a Windows service.
+Vaibhav + Chinmay. Completed locally: scrolling interface and persistent controls, background operations, connection recovery, redacted diagnostics, protected Windows identity/session/settings and stop-before-disconnect. Automated shutdown tests cover launch/download/upload; Step 3 retains live execution cancellation evidence. Windows DPAPI and a second process successfully read the same identity; a different account/machine and physical reboot remain untested. A GUI source file is not an installer or a Windows service.
 
 ### Step 5 - runtime distribution
 
@@ -158,11 +162,11 @@ Earlier label-rubric sanity checks matched only 2 of 5 eligible photos. Do not a
 
 ### Infrastructure limitations
 
-No canonical Git/clean-clone proof, production migration baseline, verified new AWS rollout, public volunteer trust model or three-device failure demo. Worker secrets still use the existing backend credential representation; secure Windows local storage is pending. Per-process rate limits need shared gateway enforcement for multiple API instances and correct proxy configuration. Do not call these solved because a unit test passed.
+No verified clean-clone packaged release, production migration baseline, new AWS rollout, public volunteer trust model or three-device failure demo. Windows local state now uses current-user DPAPI; the backend credential representation is unchanged. Per-process rate limits need shared gateway enforcement for multiple API instances and correct proxy configuration.
 
 ### Verification records
 
-Step 1: output/onboarding/step1-verification.json. Step 2: output/onboarding/step2-verification.json when present. Step 2 status in this generated handoff is read from that file. All verification claims are dated snapshots, not promises about another teammate's environment. Step 2: 29 backend tests with zero skips and 24 worker tests passed; frontend build/lint passed. Real Python approval/decline and credential-only computation passed in isolated test schemas. Lost-response and failed-write recovery passed. The Windows main window, Docker preflight and code generation were observed; the dashboard invitation succeeded. User Escape stopped Computer Use before popup inspection. Interactive approval, stop/restart and separate-laptop acceptance remain unverified.
+All verification claims are dated snapshots, not promises about another teammate's environment. Step 1: output/onboarding/step1-verification.json. Steps 2–3: their corresponding verification JSON and acceptance records. Current Step 4: output/onboarding/step4-verification.json and step4-acceptance.md — 61 worker tests, 33 backend tests with zero skips, actual custom-limit UI approval, pause/resume, diagnostics, encrypted-state app restart and disconnect. Two real image jobs completed four Docker tasks with exact input coverage. Physical separate-laptop/reboot acceptance remains unverified. Earlier exported PDFs retain historical status.
 
 ## Copyable continuation brief for a teammate
 
@@ -172,7 +176,7 @@ Work on E-Waste Compute Grid with Kushagra, Vaibhav, Nikhil and Chinmay. Read RE
 
 ### Current boundary
 
-Step 1 pairing approval/reconnect/revocation is implemented and tested. Step 2 status: Source preview implemented; interactive approval/stop acceptance remains pending. See the verification section for tested scope. The remaining resource policy, protected storage, image distribution, installer/startup and real-device release gates are independent work. Do not bypass owner approval with a shared enrollment token in the new app. Keep the existing scheduler, lease fencing and exact image accounting.
+Steps 1–4 passed their local acceptance gates. Step 4 closed the custom-limit UI approval gap and verified protected Windows state through real Docker jobs and app restart. See docs/WORKER_ONBOARDING.md and output/onboarding/step4-acceptance.md. Next is Step 5 runtime/image distribution; installer/startup and separate-device release gates follow. Do not bypass owner approval with a shared enrollment token in the new app. Keep the existing scheduler, lease fencing and exact image accounting. Earlier exported PDFs are historical snapshots; use this editable context and current ledgers for status.
 
 ### How to work
 

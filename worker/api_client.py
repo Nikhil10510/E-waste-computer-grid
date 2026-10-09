@@ -7,6 +7,7 @@ import requests
 from config import Config
 from hardware import get_hardware_specs
 from resource_limits import validate_limits, memory_bytes
+from state_store import load_state, update_state
 
 
 class APIError(RuntimeError):
@@ -26,31 +27,24 @@ class APIClient:
         self.resource_limits = None
         self.paused = False
         if Config.CREDENTIALS_FILE.exists():
-            try:
-                data = json.loads(Config.CREDENTIALS_FILE.read_text())
-                if data.get("control_plane_url", self.base_url) != self.base_url:
-                    raise ValueError("Worker identity belongs to a different grid; use a separate state directory")
-                self.node_id = data.get("node_id")
-                self.node_secret = data.get("node_secret")
-                self.registration_key = data.get("registration_key", self.registration_key)
-                self.resource_limits = data.get('resource_limits')
-                self.paused = data.get('paused', False)
-            except (OSError, json.JSONDecodeError):
-                pass
+            data = load_state(Config.CREDENTIALS_FILE)
+            if data.get("control_plane_url", self.base_url) != self.base_url:
+                raise ValueError("Worker identity belongs to a different grid; use a separate state directory")
+            self.node_id = data.get("node_id")
+            self.node_secret = data.get("node_secret")
+            self.registration_key = data.get("registration_key", self.registration_key)
+            self.resource_limits = data.get('resource_limits')
+            self.paused = data.get('paused', False)
         self.save_credentials()
 
     def save_credentials(self):
         with self.lock:
-            temp = Config.CREDENTIALS_FILE.with_suffix(".tmp")
-            temp.write_text(json.dumps({
+            update_state(Config.CREDENTIALS_FILE, {
                 "node_id": self.node_id, "node_secret": self.node_secret,
                 "registration_key": self.registration_key,
                 "control_plane_url": self.base_url,
                 "resource_limits": self.resource_limits, "paused": self.paused,
-            }))
-            if os.name != "nt":
-                temp.chmod(0o600)
-            temp.replace(Config.CREDENTIALS_FILE)
+            })
 
     def clear_credentials(self):
         with self.lock:
@@ -67,10 +61,10 @@ class APIClient:
         for attempt in range(attempts):
             try:
                 # Per-call sessions avoid sharing mutable requests.Session state with the heartbeat thread.
-                response = requests.request(method, self.base_url + path, json=payload, headers=auth, timeout=(5, 20))
+                response = requests.request(method, self.base_url + path, json=payload, headers=auth, timeout=(5, 20), allow_redirects=False)
                 if response.status_code == 204:
                     return None
-                if response.ok:
+                if 200 <= response.status_code < 300:
                     return response.json()
                 try:
                     message = response.json().get("error", response.reason)
@@ -80,7 +74,7 @@ class APIClient:
                 if response.status_code < 500 and response.status_code != 429:
                     raise last_error
             except requests.RequestException as exc:
-                last_error = APIError(str(exc))
+                last_error = APIError('Could not reach the grid. Check the connection and retry.')
             if attempt + 1 < attempts:
                 time.sleep(min(2 ** attempt, 4))
         raise last_error
@@ -135,8 +129,8 @@ class APIClient:
             "result_key": result_key,
         })
 
-    def fail_task(self, task, error, retryable=True):
+    def fail_task(self, task, error, retryable=True, attempts=3):
         return self.request("POST", f"/tasks/{task['task_id']}/fail", {
             "lease_token": task["lease_token"], "error": str(error)[:2000] or "Execution failed",
             "retryable": retryable,
-        })
+        }, attempts=attempts)

@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import sys
 import tempfile
@@ -10,6 +11,7 @@ from unittest.mock import MagicMock, patch
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'worker'))
 from config import Config
+from state_store import load_state
 from api_client import APIClient, APIError
 from agent import WorkerAgent
 from task_executor import TaskExecutor, TaskCancelled
@@ -30,7 +32,7 @@ class WorkerTests(unittest.TestCase):
                 'node_id': 'private-node', 'node_secret': 'private-secret'}))
             with self.assertRaisesRegex(ValueError, 'different grid'):
                 APIClient()
-            self.assertIn('private-secret', Config.CREDENTIALS_FILE.read_text())
+            self.assertEqual(load_state(Config.CREDENTIALS_FILE)['node_secret'], 'private-secret')
 
     def test_revoked_worker_stops_instead_of_re_enrolling(self):
         agent = WorkerAgent.__new__(WorkerAgent)
@@ -88,6 +90,23 @@ class WorkerTests(unittest.TestCase):
             self.assertEqual(executor.capabilities(), ['dummy'])
             self.assertEqual(executor.docker_client.images.get.call_count, 2)
             self.assertEqual(probe.call_count, 2)
+
+    def test_docker_enforces_owner_memory_without_additional_swap(self):
+        executor = TaskExecutor.__new__(TaskExecutor)
+        executor.docker_client = MagicMock()
+        container = executor.docker_client.containers.run.return_value
+        container.status = 'exited'
+        container.attrs = {'State': {'ExitCode': 0}}
+        with tempfile.TemporaryDirectory() as temp, patch.dict(os.environ,
+                {'WORKLOAD_CPUS': '0.5', 'WORKLOAD_MEMORY_LIMIT': '805306368'}):
+            executor.run_workload('dummy', Path(temp), Path(temp), threading.Event(), 'attempt')
+        options = executor.docker_client.containers.run.call_args.kwargs
+        self.assertEqual(options['nano_cpus'], 500000000)
+        self.assertEqual(options['mem_limit'], '805306368')
+        self.assertEqual(options['memswap_limit'], options['mem_limit'])
+        self.assertTrue(options['network_disabled'])
+        self.assertTrue(options['read_only'])
+        container.remove.assert_called_once_with(force=True)
 
     def test_preflight_rejects_success_for_wrong_input_and_cleans_temporary_files(self):
         executor = TaskExecutor.__new__(TaskExecutor)
@@ -193,15 +212,80 @@ class WorkerTests(unittest.TestCase):
         agent.api.request_task.side_effect = arriving_assignment
         agent.start()
         agent.process_task.assert_not_called()
+        agent.api.fail_task.assert_called_once_with({'task_id': 'assigned-while-stopping'},
+            'Owner stopped the worker', retryable=True, attempts=1)
         self.assertTrue(agent.cancel.is_set())
 
     def test_stopped_agent_never_clears_cancellation_to_begin_a_task(self):
         agent = WorkerAgent.__new__(WorkerAgent)
         agent.lock = threading.RLock(); agent.stop, agent.cancel = threading.Event(), threading.Event()
-        agent.executor = MagicMock(); agent.shutdown()
+        agent.api = MagicMock(); agent.executor = MagicMock(); agent.shutdown()
         agent.process_task({'task_id': 'late-task'})
         agent.executor.execute_task.assert_not_called()
         self.assertTrue(agent.cancel.is_set())
+
+    def test_owner_stop_releases_cancelled_task_without_reporting_a_result(self):
+        agent = WorkerAgent.__new__(WorkerAgent)
+        agent.lock = threading.RLock(); agent.stop, agent.cancel = threading.Event(), threading.Event()
+        agent.api = MagicMock(); agent.executor = MagicMock()
+        task = {'task_id': 'task', 'lease_token': 'attempt', 'retry_count': 0,
+                'lease_expires_at': '2099-01-01T00:00:00Z'}
+        def cancel_running(*args):
+            agent.shutdown()
+            raise TaskCancelled('Owner stop')
+        agent.executor.execute_task.side_effect = cancel_running
+        agent.process_task(task)
+        agent.api.fail_task.assert_called_once_with(task, 'Owner stopped the worker', retryable=True, attempts=1)
+        agent.api.complete_task.assert_not_called()
+        self.assertIsNone(agent.active_task)
+
+    def test_stop_during_image_download_removes_partial_inputs_and_releases_lease(self):
+        agent = WorkerAgent.__new__(WorkerAgent)
+        agent.lock = threading.RLock(); agent.stop, agent.cancel = threading.Event(), threading.Event()
+        agent.api = MagicMock(); agent.executor = TaskExecutor.__new__(TaskExecutor)
+        task = {'task_id': '11111111-1111-4111-8111-111111111111', 'lease_token': '22222222-2222-4222-8222-222222222222',
+                'retry_count': 0, 'lease_expires_at': '2099-01-01T00:00:00Z',
+                'payload': {'workload_type': 'image_inference', 'items': [{'name': 'photo.png', 'download_url': 'http://localhost/input'}]}}
+        response = MagicMock(); response.__enter__.return_value = response; response.headers = {}
+        def download(*args):
+            yield b'partial image'
+            agent.shutdown()
+            yield b'more bytes'
+        response.iter_content.side_effect = download
+        with tempfile.TemporaryDirectory() as temp, patch.object(Config, 'TEMP_EXEC_DIR', Path(temp)), patch('task_executor.requests.get', return_value=response):
+            agent.process_task(task)
+            self.assertEqual(list(Path(temp).iterdir()), [])
+        agent.api.fail_task.assert_called_once_with(task, 'Owner stopped the worker', retryable=True, attempts=1)
+        agent.api.complete_task.assert_not_called()
+
+    def test_stop_during_result_upload_prevents_completion_and_releases_lease(self):
+        agent = WorkerAgent.__new__(WorkerAgent)
+        agent.lock = threading.RLock(); agent.stop, agent.cancel = threading.Event(), threading.Event()
+        agent.api = MagicMock(); agent.executor = TaskExecutor.__new__(TaskExecutor)
+        agent.executor.execute_task = MagicMock(return_value=(b'{}', 1))
+        agent.api.get_upload_url.return_value = {'upload_url': 'http://localhost/output', 'result_key': 'output'}
+        task = {'task_id': 'task', 'lease_token': 'lease', 'retry_count': 0, 'lease_expires_at': '2099-01-01T00:00:00Z'}
+        def uploaded(*args, **kwargs):
+            agent.shutdown()
+            return MagicMock()
+        with patch('agent.requests.put', side_effect=uploaded): agent.process_task(task)
+        agent.api.complete_task.assert_not_called()
+        agent.api.fail_task.assert_called_once_with(task, 'Owner stopped the worker', retryable=True, attempts=1)
+
+    def test_lost_lease_cancellation_does_not_release_a_foreign_attempt(self):
+        agent = WorkerAgent.__new__(WorkerAgent)
+        agent.lock = threading.RLock(); agent.stop, agent.cancel = threading.Event(), threading.Event()
+        agent.api = MagicMock(); agent.executor = MagicMock()
+        agent.executor.execute_task.side_effect = TaskCancelled('Lease lost')
+        agent.process_task({'task_id': 'task', 'lease_token': 'attempt', 'retry_count': 0,
+                            'lease_expires_at': '2099-01-01T00:00:00Z'})
+        agent.api.fail_task.assert_not_called()
+
+    def test_unavailable_release_leaves_recovery_to_the_server(self):
+        agent = WorkerAgent.__new__(WorkerAgent); agent.api = MagicMock()
+        agent.api.fail_task.side_effect = APIError('Network unavailable')
+        agent.release_stopped_task({'task_id': 'task', 'lease_token': 'attempt'})
+        agent.api.fail_task.assert_called_once()
 
 
 if __name__ == '__main__':

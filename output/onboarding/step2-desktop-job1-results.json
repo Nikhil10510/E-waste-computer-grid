@@ -1,0 +1,88 @@
+{
+  "job_id": "fcdaf783-6a44-46d1-8ba8-f22e8569c773",
+  "name": "Step 2 desktop Docker acceptance",
+  "status": "COMPLETED",
+  "total_tasks": 2,
+  "completed_tasks": 2,
+  "failed_tasks": 0,
+  "items_processed": 10,
+  "items_failed": 0,
+  "predictions": [
+    {
+      "image": "00005_coffee.png",
+      "classId": 967,
+      "className": "espresso",
+      "confidence": 0.9907,
+      "task_id": "69bdde5a-29b8-4028-8cbe-1016561a3243"
+    },
+    {
+      "image": "00006_coins.png",
+      "classId": 943,
+      "className": "cucumber",
+      "confidence": 0.6825,
+      "task_id": "69bdde5a-29b8-4028-8cbe-1016561a3243"
+    },
+    {
+      "image": "00007_grass.png",
+      "classId": 363,
+      "className": "armadillo",
+      "confidence": 0.073,
+      "task_id": "69bdde5a-29b8-4028-8cbe-1016561a3243"
+    },
+    {
+      "image": "00008_gravel.png",
+      "classId": 533,
+      "className": "dishrag",
+      "confidence": 0.4859,
+      "task_id": "69bdde5a-29b8-4028-8cbe-1016561a3243"
+    },
+    {
+      "image": "00009_rocket.jpg",
+      "classId": 682,
+      "className": "obelisk",
+      "confidence": 0.4951,
+      "task_id": "69bdde5a-29b8-4028-8cbe-1016561a3243"
+    },
+    {
+      "image": "00000_astronaut.png",
+      "classId": 450,
+      "className": "bobsled",
+      "confidence": 0.3044,
+      "task_id": "f0b8ea9a-4349-4451-afab-212c6593d0d0"
+    },
+    {
+      "image": "00001_brick.png",
+      "classId": 807,
+      "className": "solar dish",
+      "confidence": 0.2362,
+      "task_id": "f0b8ea9a-4349-4451-afab-212c6593d0d0"
+    },
+    {
+      "image": "00002_camera.png",
+      "classId": 872,
+      "className": "tripod",
+      "confidence": 0.9972,
+      "task_id": "f0b8ea9a-4349-4451-afab-212c6593d0d0"
+    },
+    {
+      "image": "00003_chelsea.png",
+      "classId": 285,
+      "className": "Egyptian cat",
+      "confidence": 0.7451,
+      "task_id": "f0b8ea9a-4349-4451-afab-212c6593d0d0"
+    },
+    {
+      "image": "00004_clock_motion.png",
+      "classId": 818,
+      "className": "spotlight",
+      "confidence": 0.8267,
+      "task_id": "f0b8ea9a-4349-4451-afab-212c6593d0d0"
+    }
+  ],
+  "errors": [],
+  "metrics": {
+    "estimated_energy_wh": 0.13642777777777776,
+    "execution_time_ms": 3778,
+    "metric_type": "ESTIMATED"
+  }
+}

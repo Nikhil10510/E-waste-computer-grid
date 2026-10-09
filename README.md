@@ -18,8 +18,10 @@ separate verification milestones.
   each machine; do not copy `.venv` or `.venv-local` between laptops.
 - Node 22.12+ or Node 24 if running backend/frontend outside Docker. Docker builds
   use Node 22 and `npm ci` against the existing package locks.
-- A current source checkout. This supplied folder has no Git history. Recover the
-  team's canonical repository before claiming a clean-clone or versioned release.
+- A current source checkout from
+  [the team's repository](https://github.com/dkush2024-dot/E-waste-computer-grid).
+  Onboarding Steps 1-4 and their local acceptance records are included. Steps 5-7
+  remain open; see the [team and AI handoff](output/pdf/E_Waste_Grid_Remaining_Work_Team_AI_Handoff.md).
 
 PowerShell commands below run from the repository root. If `py -3.12` is not
 configured, use the absolute path to an installed Python 3.12 executable instead.
@@ -71,8 +73,11 @@ Those two simulation containers are not two separate physical laptops.
 ## Connect a host worker
 
 Secure pairing/approval is implemented at the API level. A source-based desktop
-approval preview and dashboard invitation form exist; complete Windows
-interaction acceptance and the installer remain pending. See
+approval preview and dashboard invitation form exist. Step 2 approval, decline,
+expiry, Docker computation, stop and saved-identity restart passed on the local
+Windows machine. Step 3 custom resource ceilings, pause/drain, restart and
+active stop/retry also passed local HTTP/Docker acceptance. Installer and
+separate-laptop acceptance remain pending. See
 [worker onboarding status and protocol](docs/WORKER_ONBOARDING.md).
 Upgrade the backend before using the updated worker with a saved identity.
 The script flow below remains enabled for local development.
@@ -86,6 +91,10 @@ Desktop preview (Python with Tkinter and prepared Docker images required):
 Use the configured API host/port on each laptop. The existing isolated local
 demo uses port 18080 instead. This preview replaces repeated launch configuration
 with a window, but still needs source/Python until the installer is built.
+Step 4 adds protected Windows credentials/settings, persistent controls and
+redacted diagnostics. Saved pause remains in effect after restart. Disconnect
+stops the owned worker before changing grids and retains its identity. See
+[Step 4 acceptance](output/onboarding/step4-acceptance.md) for local test scope.
 
 Use the matching enrollment token from your API's configuration:
 

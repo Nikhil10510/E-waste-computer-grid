@@ -1,0 +1,718 @@
+{
+  "job_id": "9d387f69-4ad8-4f69-98f6-0de53021a0cd",
+  "name": "Step 3 active stop retry",
+  "status": "COMPLETED",
+  "total_tasks": 1,
+  "completed_tasks": 1,
+  "failed_tasks": 0,
+  "items_processed": 100,
+  "items_failed": 0,
+  "predictions": [
+    {
+      "image": "00000.txt",
+      "classId": 684,
+      "className": "dummy_class_684",
+      "confidence": 0.5336,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00001.txt",
+      "classId": 566,
+      "className": "dummy_class_566",
+      "confidence": 0.8913,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00002.txt",
+      "classId": 897,
+      "className": "dummy_class_897",
+      "confidence": 0.5615,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00003.txt",
+      "classId": 668,
+      "className": "dummy_class_668",
+      "confidence": 0.801,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00004.txt",
+      "classId": 47,
+      "className": "dummy_class_47",
+      "confidence": 0.8539,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00005.txt",
+      "classId": 128,
+      "className": "dummy_class_128",
+      "confidence": 0.917,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00006.txt",
+      "classId": 28,
+      "className": "dummy_class_28",
+      "confidence": 0.6418,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00007.txt",
+      "classId": 631,
+      "className": "dummy_class_631",
+      "confidence": 0.6593,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00008.txt",
+      "classId": 72,
+      "className": "dummy_class_72",
+      "confidence": 0.7028,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00009.txt",
+      "classId": 31,
+      "className": "dummy_class_31",
+      "confidence": 0.5722,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00010.txt",
+      "classId": 116,
+      "className": "dummy_class_116",
+      "confidence": 0.6669,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00011.txt",
+      "classId": 355,
+      "className": "dummy_class_355",
+      "confidence": 0.8579,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00012.txt",
+      "classId": 196,
+      "className": "dummy_class_196",
+      "confidence": 0.6978,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00013.txt",
+      "classId": 983,
+      "className": "dummy_class_983",
+      "confidence": 0.7091,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00014.txt",
+      "classId": 531,
+      "className": "dummy_class_531",
+      "confidence": 0.628,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00015.txt",
+      "classId": 252,
+      "className": "dummy_class_252",
+      "confidence": 0.7545,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00016.txt",
+      "classId": 225,
+      "className": "dummy_class_225",
+      "confidence": 0.5397,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00017.txt",
+      "classId": 956,
+      "className": "dummy_class_956",
+      "confidence": 0.5238,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00018.txt",
+      "classId": 176,
+      "className": "dummy_class_176",
+      "confidence": 0.5173,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00019.txt",
+      "classId": 5,
+      "className": "dummy_class_5",
+      "confidence": 0.8965,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00020.txt",
+      "classId": 756,
+      "className": "dummy_class_756",
+      "confidence": 0.8041,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00021.txt",
+      "classId": 902,
+      "className": "dummy_class_902",
+      "confidence": 0.599,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00022.txt",
+      "classId": 770,
+      "className": "dummy_class_770",
+      "confidence": 0.5105,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00023.txt",
+      "classId": 862,
+      "className": "dummy_class_862",
+      "confidence": 0.8655,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00024.txt",
+      "classId": 844,
+      "className": "dummy_class_844",
+      "confidence": 0.7413,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00025.txt",
+      "classId": 90,
+      "className": "dummy_class_90",
+      "confidence": 0.8801,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00026.txt",
+      "classId": 106,
+      "className": "dummy_class_106",
+      "confidence": 0.5847,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00027.txt",
+      "classId": 644,
+      "className": "dummy_class_644",
+      "confidence": 0.651,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00028.txt",
+      "classId": 493,
+      "className": "dummy_class_493",
+      "confidence": 0.6262,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00029.txt",
+      "classId": 632,
+      "className": "dummy_class_632",
+      "confidence": 0.6185,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00030.txt",
+      "classId": 254,
+      "className": "dummy_class_254",
+      "confidence": 0.5569,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00031.txt",
+      "classId": 136,
+      "className": "dummy_class_136",
+      "confidence": 0.6484,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00032.txt",
+      "classId": 353,
+      "className": "dummy_class_353",
+      "confidence": 0.7925,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00033.txt",
+      "classId": 788,
+      "className": "dummy_class_788",
+      "confidence": 0.7189,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00034.txt",
+      "classId": 421,
+      "className": "dummy_class_421",
+      "confidence": 0.6536,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00035.txt",
+      "classId": 304,
+      "className": "dummy_class_304",
+      "confidence": 0.9406,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00036.txt",
+      "classId": 111,
+      "className": "dummy_class_111",
+      "confidence": 0.9961,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00037.txt",
+      "classId": 521,
+      "className": "dummy_class_521",
+      "confidence": 0.7943,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00038.txt",
+      "classId": 158,
+      "className": "dummy_class_158",
+      "confidence": 0.5529,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00039.txt",
+      "classId": 307,
+      "className": "dummy_class_307",
+      "confidence": 0.827,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00040.txt",
+      "classId": 43,
+      "className": "dummy_class_43",
+      "confidence": 0.6917,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00041.txt",
+      "classId": 181,
+      "className": "dummy_class_181",
+      "confidence": 0.6862,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00042.txt",
+      "classId": 580,
+      "className": "dummy_class_580",
+      "confidence": 0.7079,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00043.txt",
+      "classId": 860,
+      "className": "dummy_class_860",
+      "confidence": 0.5049,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00044.txt",
+      "classId": 948,
+      "className": "dummy_class_948",
+      "confidence": 0.5942,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00045.txt",
+      "classId": 83,
+      "className": "dummy_class_83",
+      "confidence": 0.7915,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00046.txt",
+      "classId": 779,
+      "className": "dummy_class_779",
+      "confidence": 0.9252,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00047.txt",
+      "classId": 766,
+      "className": "dummy_class_766",
+      "confidence": 0.5169,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00048.txt",
+      "classId": 38,
+      "className": "dummy_class_38",
+      "confidence": 0.5561,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00049.txt",
+      "classId": 499,
+      "className": "dummy_class_499",
+      "confidence": 0.6993,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00050.txt",
+      "classId": 368,
+      "className": "dummy_class_368",
+      "confidence": 0.5167,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00051.txt",
+      "classId": 496,
+      "className": "dummy_class_496",
+      "confidence": 0.5392,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00052.txt",
+      "classId": 710,
+      "className": "dummy_class_710",
+      "confidence": 0.8175,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00053.txt",
+      "classId": 491,
+      "className": "dummy_class_491",
+      "confidence": 0.6053,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00054.txt",
+      "classId": 550,
+      "className": "dummy_class_550",
+      "confidence": 0.6567,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00055.txt",
+      "classId": 342,
+      "className": "dummy_class_342",
+      "confidence": 0.8507,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00056.txt",
+      "classId": 941,
+      "className": "dummy_class_941",
+      "confidence": 0.9679,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00057.txt",
+      "classId": 823,
+      "className": "dummy_class_823",
+      "confidence": 0.5893,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00058.txt",
+      "classId": 949,
+      "className": "dummy_class_949",
+      "confidence": 0.8462,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00059.txt",
+      "classId": 54,
+      "className": "dummy_class_54",
+      "confidence": 0.7809,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00060.txt",
+      "classId": 363,
+      "className": "dummy_class_363",
+      "confidence": 0.5824,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00061.txt",
+      "classId": 546,
+      "className": "dummy_class_546",
+      "confidence": 0.5002,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00062.txt",
+      "classId": 987,
+      "className": "dummy_class_987",
+      "confidence": 0.9715,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00063.txt",
+      "classId": 217,
+      "className": "dummy_class_217",
+      "confidence": 0.574,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00064.txt",
+      "classId": 694,
+      "className": "dummy_class_694",
+      "confidence": 0.5581,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00065.txt",
+      "classId": 447,
+      "className": "dummy_class_447",
+      "confidence": 0.7821,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00066.txt",
+      "classId": 56,
+      "className": "dummy_class_56",
+      "confidence": 0.7101,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00067.txt",
+      "classId": 114,
+      "className": "dummy_class_114",
+      "confidence": 0.801,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00068.txt",
+      "classId": 375,
+      "className": "dummy_class_375",
+      "confidence": 0.7786,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00069.txt",
+      "classId": 359,
+      "className": "dummy_class_359",
+      "confidence": 0.6825,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00070.txt",
+      "classId": 895,
+      "className": "dummy_class_895",
+      "confidence": 0.7173,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00071.txt",
+      "classId": 458,
+      "className": "dummy_class_458",
+      "confidence": 0.6575,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00072.txt",
+      "classId": 23,
+      "className": "dummy_class_23",
+      "confidence": 0.7343,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00073.txt",
+      "classId": 836,
+      "className": "dummy_class_836",
+      "confidence": 0.5197,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00074.txt",
+      "classId": 667,
+      "className": "dummy_class_667",
+      "confidence": 0.7593,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00075.txt",
+      "classId": 480,
+      "className": "dummy_class_480",
+      "confidence": 0.7148,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00076.txt",
+      "classId": 611,
+      "className": "dummy_class_611",
+      "confidence": 0.8058,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00077.txt",
+      "classId": 494,
+      "className": "dummy_class_494",
+      "confidence": 0.773,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00078.txt",
+      "classId": 109,
+      "className": "dummy_class_109",
+      "confidence": 0.7254,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00079.txt",
+      "classId": 164,
+      "className": "dummy_class_164",
+      "confidence": 0.9921,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00080.txt",
+      "classId": 418,
+      "className": "dummy_class_418",
+      "confidence": 0.8011,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00081.txt",
+      "classId": 822,
+      "className": "dummy_class_822",
+      "confidence": 0.7955,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00082.txt",
+      "classId": 930,
+      "className": "dummy_class_930",
+      "confidence": 0.6325,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00083.txt",
+      "classId": 914,
+      "className": "dummy_class_914",
+      "confidence": 0.5764,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00084.txt",
+      "classId": 361,
+      "className": "dummy_class_361",
+      "confidence": 0.9879,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00085.txt",
+      "classId": 825,
+      "className": "dummy_class_825",
+      "confidence": 0.7818,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00086.txt",
+      "classId": 11,
+      "className": "dummy_class_11",
+      "confidence": 0.7897,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00087.txt",
+      "classId": 363,
+      "className": "dummy_class_363",
+      "confidence": 0.9794,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00088.txt",
+      "classId": 574,
+      "className": "dummy_class_574",
+      "confidence": 0.5891,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00089.txt",
+      "classId": 327,
+      "className": "dummy_class_327",
+      "confidence": 0.5234,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00090.txt",
+      "classId": 799,
+      "className": "dummy_class_799",
+      "confidence": 0.5053,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00091.txt",
+      "classId": 766,
+      "className": "dummy_class_766",
+      "confidence": 0.5378,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00092.txt",
+      "classId": 268,
+      "className": "dummy_class_268",
+      "confidence": 0.8301,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00093.txt",
+      "classId": 12,
+      "className": "dummy_class_12",
+      "confidence": 0.8896,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00094.txt",
+      "classId": 433,
+      "className": "dummy_class_433",
+      "confidence": 0.6332,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00095.txt",
+      "classId": 55,
+      "className": "dummy_class_55",
+      "confidence": 0.8188,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00096.txt",
+      "classId": 583,
+      "className": "dummy_class_583",
+      "confidence": 0.653,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00097.txt",
+      "classId": 517,
+      "className": "dummy_class_517",
+      "confidence": 0.5556,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00098.txt",
+      "classId": 81,
+      "className": "dummy_class_81",
+      "confidence": 0.5537,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    },
+    {
+      "image": "00099.txt",
+      "classId": 204,
+      "className": "dummy_class_204",
+      "confidence": 0.7307,
+      "task_id": "8a155e25-eb7d-496d-9b7c-e40445dbe1fb"
+    }
+  ],
+  "errors": [],
+  "metrics": {
+    "estimated_energy_wh": 0.4028194444444445,
+    "execution_time_ms": 11155,
+    "metric_type": "ESTIMATED"
+  }
+}

@@ -5,7 +5,8 @@
 Implemented locally: expiring pairing sessions, authenticated invitations,
 owner decisions, private worker credentials, reconnect and revocation.
 The dashboard invitation form and source-based Windows approval window now
-exist. The installer and complete Windows interaction acceptance are pending.
+exist. Step 2 Windows interaction acceptance passed locally; the installer and
+separate-device acceptance are pending.
 See step 2 below for the exact verified scope.
 
 ### Protocol
@@ -128,12 +129,14 @@ No AWS deployment was changed. See
 
 ## Next steps
 
-2. Finish interactive approval/stop/restart acceptance for the source-based
-   pairing client, invitation form and desktop window. See the step 2 record.
-3. Add configurable, validated Docker CPU/RAM limits, local resource consent,
-   pause/drain and stop semantics, with server-side admission state.
-4. Build the Windows desktop interface, responsive background polling, runtime
-   checks, readable logs, and protected identity/settings storage.
+2. Completed locally: interactive approval/decline, expiry, Docker computation,
+   stop and full desktop restart with a saved identity. See the step 2 record.
+3. Resource-policy acceptance completed locally with real HTTP/Docker checks:
+   custom CPU/RAM ceilings, pause/drain, restart, admission and active stop/retry.
+   Its custom-limit approval click was subsequently verified in Step 4.
+4. Completed locally: responsive desktop, connection state, diagnostics,
+   settings persistence, protected Windows identity/session storage and scoped
+   stop/disconnect. See the Step 4 evidence below.
 5. Distribute verified workload images and automate checks/download/preflight.
    Docker/WSL remains a supported-device prerequisite for this execution path.
 6. Package the app/runtime into a Windows installer; add optional login startup,
@@ -141,10 +144,10 @@ No AWS deployment was changed. See
 7. Verify the full flow on a separate physical laptop, including decline,
    expiry, reboot, resource limits, pause, revocation and network interruptions.
 
-These pending steps are not verified by step 1's API tests. They are separate
+The remaining steps are not verified by step 1's API tests. They are separate
 acceptance gates before describing onboarding as one-click or production-ready.
 
-## Step 2 — source-based invitation and desktop preview
+## Step 2 — source-based invitation and desktop preview (complete locally)
 
 Implemented:
 
@@ -157,18 +160,19 @@ Implemented:
 - `worker/desktop.py`: Tkinter window with background preflight/polling,
   code display/copy, approval dialog, start/stop and grid switching. No computing
   is started by merely preparing a code or receiving an invitation.
-- `worker/desktop_runtime.py`: uses the existing Docker worker with fixed limits
-  of two CPU equivalents and 2 GiB per workload. It does not pass shared admin
+- `worker/desktop_runtime.py`: uses the existing Docker worker with saved limits,
+  defaulting to two CPU equivalents and 2 GiB per workload. It does not pass shared admin
   or enrollment tokens to the worker. The worker refuses script identities
   when `REQUIRE_PAIRED_IDENTITY=true`.
 - Graceful local stop request checked by the agent. The controller waits for
   shutdown instead of killing unrelated processes or containers. An outstanding
-  network request may delay exit; pause/drain and custom limits are not added.
+  network request may delay exit. Custom limits and pause/drain acceptance is
+  recorded separately under Step 3 below.
 
 From repository root on the current API machine:
 
 ```powershell
-.\.venv-local\Scripts\python.exe worker\desktop.py --api-url http://localhost:18080/api --allow-http
+.\.venv\Scripts\python.exe worker\desktop.py --api-url http://127.0.0.1:18080/api --allow-http
 ```
 
 On another laptop replace localhost with the current API host address. Python
@@ -176,18 +180,185 @@ On another laptop replace localhost with the current API host address. Python
 are still prerequisites. No installer, tray icon, autostart or automatic image
 download exists yet. App state defaults to a per-grid folder under
 `%LOCALAPPDATA%\EWasteGrid`; `--state-directory` overrides it for development.
-Private session/identity files still need the protected-storage milestone.
+Private session/identity files now use Windows account protection; see Step 4.
 
-Verified: **29 backend tests, zero skips; 24 worker tests; frontend build/lint**.
+Verified on 2026-10-09: **31 backend tests, zero skips; 33 worker tests;
+32 workload tests; frontend build/lint**.
 Real Python clients approve/decline through HTTP and persist credentials. An
 approved real agent computes with an intentionally invalid global enrollment
 token in an isolated test schema. Unit checks cover lost responses, failed
 credential writes, redirects, desktop identity enforcement and scoped stop.
 
-The Windows main window was visually inspected; its Docker preflight generated
-a code. The local dashboard showed a successful invitation to that code.
-Computer Use was stopped with Escape before the delivered approval popup was
-visually checked. Native button approval, worker stop/restart and separate-device
-acceptance are **not verified**. Continue those checks next; do not mark all of
-step 2 complete based on API tests alone. The local dashboard image was rebuilt;
-AWS was not updated. See `output/onboarding/step2-verification.json`.
+The local dashboard invitation form was previously observed submitting a code
+successfully. This continuation used real authenticated HTTP invitations and
+the actual Windows desktop controls. Preparing/inviting created zero nodes and
+no worker process before owner approval. The dialog displayed the grid/API
+address and resource ceilings. Approve and start created one paired identity.
+Ten tracked photos completed in two Docker tasks with exact input coverage and
+zero failures. Stop worker reported a clean stop with no workload containers
+remaining. After closing and reopening the entire app, Prepare connection showed
+Already approved. A second job stayed queued until Start worker was pressed,
+then completed under the same node ID, without another pairing session/node.
+
+Decline created no identity, node or worker. Expiry was exercised by advancing
+only a fresh session's expiry in the isolated test schema; the app cleared it,
+showed Code expired, and could generate a fresh code. The HTTP 410 decision-race
+path is also covered by a Tkinter callback regression test. It previously kept
+polling an expired private session; the fix clears that session and enables
+Prepare connection. Frontend lint is scoped to application source/config so it
+does not scan installed dependency code.
+
+This verifies **Step 2 locally**, not onboarding on a separate physical laptop,
+model classification accuracy, an installer, or the full Step 3 resource-policy
+matrix. No AWS deployment was changed. Results and sanitized task ownership are
+linked from [the acceptance record](../output/onboarding/step2-acceptance.md) and
+[the verification ledger](../output/onboarding/step2-verification.json).
+
+## Step 3 — participation and resource policy (verified locally)
+
+The existing policy is now checked with real Docker containers, kernel cgroups
+and the authenticated owner API. The test worker approved 0.5 CPU equivalents
+and 0.75 GiB RAM. Docker enforced a 50,000/100,000 CPU quota, 805,306,368 memory
+bytes and zero swap. Its paused process could not claim new work; pause during
+execution drained only the active task. Pause and limits survived agent restart.
+Resume finished the remaining work. A job requiring 1 GiB remained queued on
+the 0.75 GiB worker despite its larger physical RAM.
+
+Two gaps were fixed: Docker now caps combined memory/swap at the RAM ceiling;
+owner stop explicitly returns a cancelled assignment using its lease token,
+rather than leaving it assigned until expiry. This also handles a task response
+arriving during shutdown. The release gets one HTTP attempt; failed delivery
+falls back to server lease recovery. Revoked/stale leases cannot release a new
+attempt. A stop/retry uses the existing retry budget, so repeated interruptions
+can eventually produce a failed task.
+
+### Using the controls
+
+1. Open the source desktop against your running API, choose a laptop name and
+   CPU/RAM ceilings, then click Prepare connection. Use the same API address on
+   restart; state is stored separately per grid. For normal image jobs keep at
+   least the default 2 GiB ceiling, which their default admission requirement uses.
+2. Share only the code. After the administrator invites it, inspect the grid
+   address and displayed ceilings and approve locally. Merely receiving an
+   invitation starts no computation. Limits are fixed by this approval; changing
+   them requires fresh owner approval, not a server-side increase.
+3. Pause worker blocks new assignments while current work finishes. The API may
+   show DRAINING before PAUSED. Resume worker allows polling to claim work again.
+4. Stop worker cancels local execution and removes only this worker's containers.
+   The interrupted task can retry on an eligible worker. Stop is asynchronous;
+   outstanding network/Docker operations may delay it. After a stopped process,
+   click Start worker explicitly. Starting while saved pause is true stays paused.
+
+CPU is a quota in logical CPU equivalents, not a dedicated core reservation or
+a percentage of the whole PC. RAM is a ceiling per workload container. These
+ceilings do not include the Python agent or Docker/WSL overhead and do not pool
+memory across laptops. One task runs at a time per worker. Native development
+mode does not enforce Docker resource ceilings. The current admission contract
+checks capabilities and required RAM, not live CPU utilization or a CPU minimum.
+
+Verified on 2026-10-09: **33 backend tests, zero skips; 37 worker tests**. Backend
+coverage includes simultaneous task polls versus pause/revoke, frozen consent,
+lease fencing and duplicate result accounting. Worker coverage includes real Tk
+callbacks with mocked HTTP/compute, resource validation and stop races. Live
+Docker acceptance processed 300 synthetic inputs in three accepted tasks with
+exact coverage and zero failures, including a cancelled/retried attempt. Another
+test container remained running through all stops/restarts.
+
+Custom values and preflight were observed in the desktop, but Windows capture
+failed before its custom-limit approval click could be verified. That decision
+and the live pause/resume matrix used the real HTTP owner client. This does not
+claim a new full manual UI run, physical-laptop/reboot acceptance or waste-model
+accuracy. This historical Step 3 record predates the Step 4 UI/storage checks
+below. Steps 5–7 remain open. No schema/API
+contract or AWS deployment changed in this continuation.
+
+See [Step 3 acceptance](../output/onboarding/step3-acceptance.md),
+[verification ledger](../output/onboarding/step3-verification.json) and
+[live Docker evidence](../output/onboarding/step3-docker-verification.json).
+
+## Step 4 — desktop reliability and protected state (complete locally)
+
+The window now has a scrolling Connection tab and a Diagnostics tab. Start,
+Stop, Pause/Resume and Disconnect stay outside the scrolling area. The default
+window fits the tested Windows display at 150% scaling; a Tk test also verifies
+that the controls remain visible at the minimum 520 × 440 logical size.
+Preflight, HTTP polling, worker launch and log reads run in background threads.
+The interface reports connection failures, retries the existing identity, and
+shows recovery without obtaining a new identity. Authentication denial stops
+participation and requires owner attention.
+
+Windows encrypts the complete credentials, private pairing session and settings
+records with current-user DPAPI. Existing plain JSON migrates atomically when
+read successfully. Encryption/decryption failures, damaged envelopes and oversized
+state stop the operation without replacing the identity or enrolling a fresh
+worker. File locks and atomic updates preserve fields when the desktop and
+agent save concurrently. POSIX uses mode 0600 files, not Windows encryption.
+DPAPI uses the Windows account's protection, rather than a key stored beside
+the credentials. Its account binding is described by
+[Microsoft](https://learn.microsoft.com/en-us/windows/win32/api/dpapi/nf-dpapi-cryptprotectdata).
+It does not protect against malicious software already running as that user.
+Migration does not remove historical plaintext from backups or disk history.
+
+### Open and use the desktop
+
+From repository root, using the existing Python environment:
+
+```powershell
+.\.venv-local\Scripts\python.exe worker\desktop.py --api-url http://SERVER_IP:8080/api --allow-http
+```
+
+Replace SERVER_IP with your coordinator's current LAN address. Use its configured
+port; 18082 was only this acceptance fixture. For HTTPS omit `--allow-http`.
+Python with Tkinter and the prepared Docker images are still prerequisites.
+
+1. Enter the trusted API address, laptop name and desired CPU/RAM ceilings.
+   Prepare connection checks the runtime and generates a code, or verifies a
+   saved approved identity. Share only the pairing code with the administrator.
+2. Inspect the invitation and approve locally. No worker starts before approval.
+   Normal image submissions require the default 2 GiB RAM admission requirement;
+   the 0.75 GiB acceptance jobs below explicitly requested 0.75 GiB.
+3. Pause blocks new tasks while current work finishes. Stop cancels local work;
+   an outstanding HTTP/Docker operation may take time to return. A Stop request
+   made while launch is pending is applied once the process exists.
+4. Disconnect / change grid stops the owned process before unlocking the address.
+   It retains the saved identity and does not revoke it or erase results.
+   Reconnect to the same grid and explicitly Start worker. A saved pause still
+   requires Resume. Closing the app waits for background work and the owned agent.
+5. Open Diagnostics and click Refresh diagnostics for bounded preflight and task
+   log tails. Private tokens, bearer values and URL queries are redacted. The
+   desktop agent log rotates at 1 MiB with two backups. This is local diagnosis,
+   not a remote telemetry service; review logs before sharing.
+
+Default state is per grid under `%LOCALAPPDATA%\EWasteGrid`. The last selected
+grid is restored when starting without `--api-url`; name, HTTP consent and limits
+are restored for that grid. An explicit `--state-directory` isolates development
+fixtures and does not write global desktop preferences. Keep state on its original
+Windows account and computer; do not copy it to other workers. For unreadable
+state, preserve the files and investigate the account/backup rather than deleting
+them to force enrollment. Each physical laptop needs its own approval.
+
+### Verification and boundary
+
+On 2026-10-09: **61 worker tests passed; 33 backend tests passed with zero skips**,
+including actual PostgreSQL/HTTP and Windows encryption/subprocess checks.
+Automated regressions cover network loss/recovery, revoked identity, delayed
+preflight/launch, failed launch, shutdown during download/upload, atomic migration,
+tampering, failed writes, concurrent state updates and log redaction. Docker
+execution cancellation and retry retain the Step 3 live evidence.
+
+Actual Windows UI acceptance approved 0.5 CPU / 0.75 GiB, then paused, resumed,
+displayed diagnostics, closed, reopened and reconnected with the same identity.
+Two real ten-photo jobs each completed two Docker tasks with exact filename
+coverage and zero failures. Both stayed queued while paused, including after
+restart/Start. Disconnect stopped the owned agent and retained encrypted identity.
+This closes the prior manual custom-limit approval gap.
+
+The existing CLI source ZIP allowlist now includes the new protected-state,
+logging and resource-limit modules; its integrity/hash check passed. This is a
+source handoff compatibility fix, not Step 5 image distribution or Step 6 packaging.
+There is no installer, service, tray or autostart yet. Other Windows accounts,
+physical reboot, separate laptops and LAN/network fault acceptance remain Step 7
+checks. No backend API/schema, workload/model or AWS deployment changed here.
+
+See [Step 4 acceptance](../output/onboarding/step4-acceptance.md) and
+[verification ledger](../output/onboarding/step4-verification.json).

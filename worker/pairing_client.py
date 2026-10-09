@@ -9,6 +9,7 @@ from urllib.parse import urlsplit, urlunsplit
 import requests
 from api_client import APIError
 from resource_limits import validate_limits
+from state_store import load_state, save_state, update_state
 
 
 def normalize_api_url(value, allow_http=False):
@@ -31,19 +32,7 @@ def state_directory(api_url):
     return base / 'EWasteGrid' / hashlib.sha256(api_url.encode()).hexdigest()[:16]
 
 
-def atomic_json(path, value):
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(path.name + '.' + uuid.uuid4().hex + '.tmp')
-    try:
-        with temporary.open('x', encoding='utf-8') as stream:
-            if os.name != 'nt': os.chmod(temporary, 0o600)
-            json.dump(value, stream)
-            stream.flush()
-            os.fsync(stream.fileno())
-        temporary.replace(path)
-    finally:
-        temporary.unlink(missing_ok=True)
+atomic_json = save_state
 
 
 class PairingClient:
@@ -54,7 +43,7 @@ class PairingClient:
         self.credentials_file = self.directory / 'credentials.json'
         self.session = None
         if self.session_file.exists():
-            saved = json.loads(self.session_file.read_text(encoding='utf-8'))
+            saved = load_state(self.session_file)
             if saved.get('control_plane_url') != self.api_url:
                 raise ValueError('Pairing session belongs to another grid')
             self._validate_session(saved)
@@ -123,22 +112,21 @@ class PairingClient:
 
     def saved_identity(self):
         if not self.credentials_file.exists(): return None
-        data = json.loads(self.credentials_file.read_text(encoding='utf-8'))
+        data = load_state(self.credentials_file)
         if data.get('control_plane_url') != self.api_url: raise ValueError('Worker identity belongs to another grid')
         if not data.get('node_id') or not data.get('node_secret'): return None
         session = self.request('GET', '/nodes/session', secret=data['node_secret'], node_id=data['node_id'])
         if session.get('enrollment_mode') != 'paired':
             raise ValueError('This identity used script enrollment. Use a fresh app state directory and obtain owner approval.')
         data.update(resource_limits=session.get('resource_limits'), paused=session.get('paused', False))
-        atomic_json(self.credentials_file, data)
+        update_state(self.credentials_file, {'resource_limits': data['resource_limits'], 'paused': data['paused']})
         return session
 
     def set_paused(self, paused):
         if not isinstance(paused, bool): raise ValueError('paused must be boolean')
-        saved = json.loads(self.credentials_file.read_text(encoding='utf-8'))
+        saved = load_state(self.credentials_file)
         if saved.get('control_plane_url') != self.api_url: raise ValueError('Worker identity belongs to another grid')
         data = self.request('POST', '/nodes/' + saved['node_id'] + '/participation', {'paused': paused},
             secret=saved['node_secret'], node_id=saved['node_id'])
-        saved.update(paused=data['paused'], resource_limits=data.get('resource_limits'))
-        atomic_json(self.credentials_file, saved)
+        update_state(self.credentials_file, {'paused': data['paused'], 'resource_limits': data.get('resource_limits')})
         return data

@@ -219,7 +219,12 @@ describe('real PostgreSQL and HTTP integration', { skip: !process.env.TEST_DATAB
     const approved = await runPairingClient('owner-client', 'approve');
     assert.equal(approved.state, 'APPROVED');
     const saved = JSON.parse(fs.readFileSync(path.join(temp, 'owner-client', 'credentials.json'), 'utf8'));
-    assert.equal(saved.node_id, approved.node_id); assert.equal(saved.control_plane_url, base + '/api');
+    if (process.platform === 'win32') {
+      assert.equal(saved.protection, 'windows-dpapi-user');
+      assert.equal(saved.node_secret, undefined);
+    } else {
+      assert.equal(saved.node_id, approved.node_id); assert.equal(saved.control_plane_url, base + '/api');
+    }
     const j = await job(['owner-approved compute']);
     await runWorker('owner-client', true);
     const result = (await api('GET', `/api/jobs/${j.id}/results`)).body;
@@ -313,6 +318,47 @@ describe('real PostgreSQL and HTTP integration', { skip: !process.env.TEST_DATAB
     const resumed = await pause(false); assert.equal(resumed.body.paused, false);
     const second = await take(node); const nextOutput = await upload(node, second); await complete(node, second, nextOutput.result_key);
     assert.equal((await prisma.job.findUnique({ where: { id: j.id } })).status, 'COMPLETED');
+  });
+  test('concurrent pause and polls allow at most one draining attempt and block subsequent work', async () => {
+    // Seed paired policy independently of pairing tests' per-IP creation budget.
+    const node = await register();
+    await prisma.node.update({ where: { id: node.node_id }, data: { enrollmentMode: 'paired', cpuLimit: 2, memoryLimitGb: 2 } });
+    await job(['first', 'second', 'third']);
+    const [paused, ...polls] = await Promise.all([
+      api('POST', `/api/nodes/${node.node_id}/participation`, { paused: true }, node),
+      ...Array.from({ length: 6 }, () => api('GET', '/api/tasks/request', undefined, node)),
+    ]);
+    assert.equal(paused.status, 200);
+    assert.ok(polls.every(r => r.status === 200 || r.status === 204), JSON.stringify(polls));
+    const assigned = polls.filter(r => r.status === 200).map(r => r.body);
+    assert.ok(new Set(assigned.map(t => t.task_id)).size <= 1);
+    assert.ok(new Set(assigned.map(t => t.lease_token)).size <= 1);
+    assert.equal(await prisma.task.count({ where: { status: 'ASSIGNED' } }), assigned.length ? 1 : 0);
+    assert.equal((await prisma.node.findUnique({ where: { id: node.node_id } })).paused, true);
+    if (assigned.length) {
+      const output = await upload(node, assigned[0]);
+      assert.equal((await complete(node, assigned[0], output.result_key)).status, 200);
+      assert.equal(await prisma.metric.count(), 1);
+    }
+    assert.equal((await api('GET', '/api/tasks/request', undefined, node)).status, 204);
+  });
+  test('concurrent revocation and polls prevent subsequent assignment and result acceptance', async () => {
+    const node = await register();
+    await prisma.node.update({ where: { id: node.node_id }, data: { enrollmentMode: 'paired', cpuLimit: 2, memoryLimitGb: 2 } });
+    await job(['first', 'second']);
+    const [revoked, ...polls] = await Promise.all([
+      api('POST', `/api/nodes/${node.node_id}/revoke`, {}, node),
+      ...Array.from({ length: 6 }, () => api('GET', '/api/tasks/request', undefined, node)),
+    ]);
+    assert.equal(revoked.status, 200);
+    assert.ok(polls.every(r => r.status === 200 || r.status === 403), JSON.stringify(polls));
+    const assigned = polls.filter(r => r.status === 200).map(r => r.body);
+    assert.ok(new Set(assigned.map(t => t.task_id)).size <= 1);
+    assert.ok(new Set(assigned.map(t => t.lease_token)).size <= 1);
+    assert.equal((await api('GET', '/api/tasks/request', undefined, node)).status, 403);
+    for (const task of assigned) assert.equal((await complete(node, task, 'unaccepted')).status, 403);
+    assert.equal(await prisma.metric.count(), 0);
+    assert.equal(await prisma.task.count({ where: { status: 'COMPLETED' } }), 0);
   });
   test('concurrent polls never assign the same task to two workers', async () => {
     const workers = await Promise.all(Array.from({ length: 8 }, () => register()));

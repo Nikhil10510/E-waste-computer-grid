@@ -1,9 +1,11 @@
 """Exercise actual Tk callbacks with mocked network/compute, not an owner's live consent."""
 import json
+import gc
 from pathlib import Path
 import sys
 import tempfile
 import time
+import threading
 import tkinter as tk
 import unittest
 import uuid
@@ -11,6 +13,8 @@ from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from desktop import WorkerWindow
+from api_client import APIError
+from state_store import load_state
 
 
 class DesktopTests(unittest.TestCase):
@@ -59,6 +63,10 @@ class DesktopTests(unittest.TestCase):
         if self.window.lock_context: self.window.lock_context.__exit__(None, None, None)
         self.root.destroy()
         patch.stopall()
+        # Destroyed Tk widgets contain callback cycles. Collect them here on
+        # their owning thread, before the next test starts a background worker.
+        self.window = self.root = None
+        gc.collect()
         self.temp.cleanup()
 
     def prepare(self):
@@ -74,8 +82,8 @@ class DesktopTests(unittest.TestCase):
         self.spawn.assert_not_called()
         self.assertFalse((Path(self.temp.name) / 'credentials.json').exists())
         self.window.popup_buttons[0].invoke()
-        self.until(lambda: self.spawn.called)
-        saved = json.loads((Path(self.temp.name) / 'credentials.json').read_text())
+        self.until(lambda: self.spawn.called and not self.window.busy)
+        saved = load_state(Path(self.temp.name) / 'credentials.json')
         self.assertEqual(saved['node_id'], self.node_id)
         self.window.stop_button.invoke()
         self.assertTrue((Path(self.temp.name) / 'stop.request').exists())
@@ -83,8 +91,8 @@ class DesktopTests(unittest.TestCase):
         self.until(lambda: self.window.runtime.process is None)
         self.process.poll.return_value = None
         self.window.start_button.invoke()
-        self.assertEqual(self.spawn.call_count, 2)
-        self.assertEqual(json.loads((Path(self.temp.name) / 'credentials.json').read_text())['node_id'], self.node_id)
+        self.until(lambda: self.spawn.call_count == 2 and not self.window.busy)
+        self.assertEqual(load_state(Path(self.temp.name) / 'credentials.json')['node_id'], self.node_id)
 
     def test_decline_button_never_starts_a_worker(self):
         self.prepare(); self.invite(); self.window.popup_buttons[1].invoke()
@@ -92,16 +100,124 @@ class DesktopTests(unittest.TestCase):
         self.spawn.assert_not_called()
         self.assertFalse((Path(self.temp.name) / 'credentials.json').exists())
 
+    def test_expired_session_can_prepare_a_new_code_without_starting_compute(self):
+        self.prepare(); self.invite()
+        self.window.events.put(('poll', None, APIError('Pairing session expired', 410)))
+        self.until(lambda: self.window.client.session is None and self.window.popup is None)
+        self.assertFalse((Path(self.temp.name) / 'pairing.json').exists())
+        self.assertEqual(str(self.window.prepare_button['state']), 'normal')
+        self.spawn.assert_not_called()
+        self.prepare()
+        self.assertIsNotNone(self.window.client.session)
+        self.spawn.assert_not_called()
+
     def test_pause_and_resume_callbacks_persist_state_without_restarting_compute(self):
         self.prepare(); self.invite(); self.window.popup_buttons[0].invoke()
-        self.until(lambda: self.spawn.called)
+        self.until(lambda: self.spawn.called and not self.window.busy)
         self.window.pause_button.invoke()
         self.until(lambda: self.window.paused and not self.window.busy)
-        self.assertTrue(json.loads((Path(self.temp.name) / 'credentials.json').read_text())['paused'])
+        self.assertTrue(load_state(Path(self.temp.name) / 'credentials.json')['paused'])
         self.window.pause_button.invoke()
         self.until(lambda: not self.window.paused and not self.window.busy)
-        self.assertFalse(json.loads((Path(self.temp.name) / 'credentials.json').read_text())['paused'])
+        self.assertFalse(load_state(Path(self.temp.name) / 'credentials.json')['paused'])
         self.assertEqual(self.spawn.call_count, 1)
+
+    def test_slow_preflight_keeps_ui_responsive_and_close_waits_without_compute(self):
+        waiting = threading.Event(); release = threading.Event()
+        def slow():
+            waiting.set(); release.wait(3); return ['dummy', 'image_inference']
+        self.preflight.side_effect = slow
+        self.window.prepare()
+        self.until(waiting.is_set)
+        tick = []
+        self.root.after(10, lambda: tick.append(True))
+        self.until(lambda: bool(tick))
+        self.assertTrue(self.window.busy)
+        self.window.finish_close = MagicMock()
+        self.window.close(); self.root.update()
+        self.window.finish_close.assert_not_called()
+        release.set()
+        self.until(lambda: self.window.finish_close.called)
+        self.spawn.assert_not_called()
+
+    def test_settings_restore_name_and_custom_limits_without_network_or_compute(self):
+        self.window.name.set('Retired laptop'); self.window.cpu_value.set('0.5'); self.window.memory_value.set('0.75')
+        self.prepare()
+        self.window.name.set('changed'); self.window.cpu_value.set('2'); self.window.memory_value.set('2')
+        self.requests.reset_mock()
+        self.window.restore_settings('https://grid.example/api', False)
+        self.assertEqual(self.window.name.get(), 'Retired laptop')
+        self.assertEqual(self.window.cpu_value.get(), '0.5')
+        self.assertEqual(self.window.memory_value.get(), '0.75')
+        self.requests.assert_not_called(); self.spawn.assert_not_called()
+
+    def test_connection_loss_does_not_discard_identity_or_grant_approval(self):
+        self.prepare()
+        self.window.events.put(('poll', None, APIError('Connection lost')))
+        self.until(lambda: 'unavailable' in self.window.connection.get())
+        self.assertIsNotNone(self.window.client.session)
+        self.assertFalse(self.window.approved)
+        self.spawn.assert_not_called()
+
+    def test_revoke_notification_stops_owned_process_and_disables_restart(self):
+        self.prepare(); self.invite(); self.window.popup_buttons[0].invoke()
+        self.until(lambda: self.spawn.called and not self.window.busy)
+        self.window.events.put(('session', None, APIError('Worker revoked', 403)))
+        self.until(lambda: not self.window.approved)
+        self.assertTrue((Path(self.temp.name)/'stop.request').exists())
+        self.assertEqual(str(self.window.start_button['state']), 'disabled')
+
+    def test_recovered_session_clears_network_error_and_displays_saved_pause(self):
+        self.prepare(); self.invite(); self.window.popup_buttons[0].invoke()
+        self.until(lambda: self.spawn.called and not self.window.busy)
+        self.window.events.put(('session', None, APIError('Connection lost')))
+        self.until(lambda: 'unavailable' in self.window.connection.get())
+        self.window.events.put(('session', {'status':'OFFLINE', 'paused':True}, None))
+        self.until(lambda: self.window.paused)
+        self.assertIn('paused', self.window.connection.get())
+        self.assertIn('restored', self.window.status.get())
+        self.assertEqual(self.window.poll_delay, 3000)
+
+    def test_disconnect_waits_for_stop_and_retains_approved_identity(self):
+        self.prepare(); self.invite(); self.window.popup_buttons[0].invoke()
+        self.until(lambda: self.spawn.called and not self.window.busy)
+        self.window.reset_connection()
+        self.assertTrue(self.window.disconnecting)
+        self.assertIsNotNone(self.window.client)
+        self.process.poll.return_value = 0
+        self.until(lambda: self.window.client is None)
+        self.assertTrue((Path(self.temp.name)/'credentials.json').exists())
+        self.assertEqual(self.window.connection.get(), 'Not connected')
+
+    def test_controls_stay_visible_at_small_window_size(self):
+        self.root.deiconify(); self.root.geometry('520x440'); self.root.update()
+        for button in (self.window.start_button,self.window.stop_button,self.window.pause_button,self.window.disconnect_button):
+            self.assertTrue(button.winfo_ismapped())
+            bottom = button.winfo_rooty() - self.root.winfo_rooty() + button.winfo_height()
+            self.assertLessEqual(bottom, self.root.winfo_height())
+
+    def test_stop_during_background_launch_is_applied_after_process_exists(self):
+        waiting = threading.Event(); release = threading.Event()
+        def slow_spawn(*args, **kwargs):
+            waiting.set(); release.wait(3); return self.process
+        self.spawn.side_effect = slow_spawn
+        self.prepare(); self.invite(); self.window.popup_buttons[0].invoke()
+        self.until(waiting.is_set)
+        self.window.stop_button.invoke()
+        self.assertTrue(self.window.stop_after_start)
+        release.set()
+        self.until(lambda: (Path(self.temp.name)/'stop.request').exists())
+        self.assertTrue(self.window.stopping)
+
+    def test_failed_launch_leaves_saved_approval_and_allows_retry(self):
+        self.spawn.side_effect = OSError('Unable to launch worker')
+        self.prepare(); self.invite(); self.window.popup_buttons[0].invoke()
+        self.until(lambda: self.spawn.called and not self.window.busy)
+        self.assertFalse(self.window.starting)
+        self.assertTrue(self.window.approved)
+        self.assertEqual(str(self.window.start_button['state']), 'normal')
+        self.assertEqual(str(self.window.stop_button['state']), 'disabled')
+        self.assertEqual(load_state(Path(self.temp.name)/'credentials.json')['node_id'], self.node_id)
 
 
 if __name__ == '__main__': unittest.main()

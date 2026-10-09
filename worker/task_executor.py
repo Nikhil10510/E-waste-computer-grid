@@ -117,6 +117,7 @@ class TaskExecutor:
                 network_disabled=True, read_only=True, cap_drop=["ALL"],
                 security_opt=["no-new-privileges"], pids_limit=128,
                 mem_limit=os.getenv("WORKLOAD_MEMORY_LIMIT", "2g"),
+                memswap_limit=os.getenv("WORKLOAD_MEMORY_LIMIT", "2g"),
                 nano_cpus=int(float(os.getenv("WORKLOAD_CPUS", "2")) * 1_000_000_000),
                 tmpfs={"/tmp": "rw,noexec,nosuid,size=64m"},
                 user=f"{os.getuid()}:{os.getgid()}" if hasattr(os, "getuid") else None,

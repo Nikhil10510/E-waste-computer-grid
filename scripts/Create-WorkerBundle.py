@@ -7,6 +7,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 FILES = [
     'worker/agent.py', 'worker/api_client.py', 'worker/config.py', 'worker/hardware.py',
+    'worker/state_store.py', 'worker/log_safety.py', 'worker/resource_limits.py',
     'worker/task_executor.py', 'worker/requirements.txt', 'worker/README.md', 'worker/.env.example',
     'scripts/Start-Worker.ps1', 'docs/PHASE_2_WINDOWS_WORKER.md',
     'workloads/energy/energy_calculator.py', 'workloads/benchmark/hardware_benchmark.py',

@@ -81,9 +81,24 @@ Pairing, owner approval, credential-based reconnect and revocation are available
 in the backend. A source-based desktop preview is available through
 `python worker/desktop.py --api-url https://your-grid.example/api` from repo root.
 For a trusted local HTTP demo add `--allow-http`. It needs Tkinter and prepared
-Docker images. Full interactive acceptance, installer and protected storage are
-pending. See
+Docker images. Step 2 interaction acceptance passed locally: approve, decline,
+expiry, real Docker computation, stop and full app restart with the same identity.
+Step 4 adds Windows DPAPI-protected identity/session/settings files, a scrolling
+connection form, persistent Stop/Disconnect controls and redacted diagnostics.
+Legacy state migrates atomically; unreadable state is preserved for recovery.
+Keep worker state on its original Windows account and laptop. Settings and saved
+pause survive app restart; Start does not override Pause. Disconnect stops the
+agent and retains its identity. Installer and separate-device acceptance remain pending. See
 [WORKER_ONBOARDING.md](../docs/WORKER_ONBOARDING.md).
+Step 3 policy acceptance passed locally: owner ceilings are enforced by Docker,
+including zero additional swap; pause drains current work and blocks the next;
+restart preserves pause; active stop releases its lease for retry. Network
+failure falls back to lease expiry. Repeated stops consume the normal retry
+budget. Limits cover the workload, not Python/Docker/WSL overhead. Normal image
+jobs require the default 2 GiB; a lower approved ceiling can leave them queued.
+See [Step 3 evidence](../output/onboarding/step3-acceptance.md) for test scope and
+its historical test scope. The custom-limit approval click and full desktop
+restart were subsequently verified in [Step 4 acceptance](../output/onboarding/step4-acceptance.md).
 An agent with saved credentials now authenticates using `/nodes/session`;
 upgrade the backend before deploying this agent. Authentication denial stops
 the agent and requires owner attention; it never silently re-enrolls.

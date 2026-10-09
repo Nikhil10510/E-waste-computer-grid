@@ -1,0 +1,14 @@
+{
+  "job_id": "fcdaf783-6a44-46d1-8ba8-f22e8569c773",
+  "status": "COMPLETED",
+  "tasks": 2,
+  "images": 10,
+  "exact_input_coverage": true,
+  "errors": 0,
+  "task_ids": [
+    "69bdde5a-29b8-4028-8cbe-1016561a3243",
+    "f0b8ea9a-4349-4451-afab-212c6593d0d0"
+  ],
+  "metric_type": "ESTIMATED",
+  "scope": "Downloaded job accounting/structure; not visual label accuracy or physical-machine evidence."
+}

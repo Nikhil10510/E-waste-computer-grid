@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-09T16:40:10.105781+00:00",
+  "status": "PASSED",
+  "scope": "Local Docker and HTTP acceptance; not a physical second-device test",
+  "node_id": "8d724529-3bcc-46a0-ac53-6fb284f090b5",
+  "resource_limits": {
+    "cpu": 0.5,
+    "memory_gb": 0.75
+  },
+  "checks": {
+    "paused_start_admits_no_task": true,
+    "docker_and_kernel_resource_ceilings": {
+      "nano_cpus": 500000000,
+      "memory_bytes": 805306368,
+      "memory_swap_bytes": 805306368,
+      "network_disabled": true,
+      "read_only_root": true,
+      "cgroup": {
+        "cpu.max": "50000 100000",
+        "memory.max": "805306368",
+        "memory.swap.max": "0"
+      }
+    },
+    "pause_drains_current_task_and_blocks_next": true,
+    "pause_and_limits_survive_process_restart": true,
+    "resume_finishes_remaining_task": {
+      "job_id": "ca919734-696c-4e79-8310-4d6e16a2af1f",
+      "items": 200,
+      "tasks": 2,
+      "result_file": "step3-docker-verification-drain-results.json"
+    },
+    "active_stop_cancels_only_owned_work": {
+      "stop_seconds": 0.469
+    },
+    "stopped_attempt_requeues_with_new_lease": {
+      "retry_count": 1
+    },
+    "retry_has_exactly_one_accepted_result": {
+      "job_id": "9d387f69-4ad8-4f69-98f6-0de53021a0cd",
+      "items": 100,
+      "tasks": 1,
+      "result_file": "step3-docker-verification-retry-results.json"
+    },
+    "RAM_incompatible_job_stays_queued": true,
+    "same_approved_identity_reused": true,
+    "unrelated_container_retained_through_stop_and_restart": true
+  },
+  "jobs": {
+    "RAM incompatible": "dfbbb55a-cc2f-4bd9-81cc-e1d8dc7b4765",
+    "pause drain": "ca919734-696c-4e79-8310-4d6e16a2af1f",
+    "active stop retry": "9d387f69-4ad8-4f69-98f6-0de53021a0cd"
+  }
+}
