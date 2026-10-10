@@ -17,6 +17,7 @@ from api_client import APIClient, APIError
 from config import Config
 from task_executor import TaskExecutor, TaskCancelled
 from log_safety import SafeFormatter
+from launch import prepare_external_programs
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -59,9 +60,15 @@ class WorkerAgent:
             handler = RotatingFileHandler(os.environ['EWASTE_LOG_FILE'], maxBytes=1024 * 1024, backupCount=2, encoding='utf-8')
             handler.setFormatter(SafeFormatter(lambda: (self.api.node_secret, Config.ENROLLMENT_TOKEN)))
             logging.getLogger().handlers = [handler]
-        self.executor = TaskExecutor()
-        self.executor.recover_containers()
-        self.capabilities = self.executor.capabilities()
+        # Owner stop/crash applies during startup probes as well as real jobs.
+        self.start_local_monitors()
+        try:
+            self.executor = TaskExecutor()
+            self.executor.recover_containers()
+            self.capabilities = self.executor.capabilities(self.cancel)
+        except BaseException:
+            self.shutdown()
+            raise
 
     def shutdown(self, *_args):
         with self.lock:
@@ -79,13 +86,13 @@ class WorkerAgent:
                         if reply["action"] == "CANCEL_TASK":
                             self.cancel.set()
                         elif reply.get("lease_expires_at"):
-                            self.lease_deadline = datetime.fromisoformat(reply["lease_expires_at"].replace("Z", "+00:00")).timestamp()
+                            self.confirm_lease(reply)
             except APIError as exc:
                 logger.warning("Heartbeat failed: %s", exc)
                 if exc.status in (401, 403):
                     self.shutdown()
                 with self.lock:
-                    if task is self.active_task and task and (exc.status in (401, 403) or time.time() >= self.lease_deadline):
+                    if task is self.active_task and task and (exc.status in (401, 403) or self.lease_expired()):
                         self.cancel.set()
             self.stop.wait(self.api.heartbeat_interval)
 
@@ -97,6 +104,26 @@ class WorkerAgent:
                 self.shutdown()
                 return
             self.stop.wait(0.25)
+
+    def lease_watchdog_loop(self):
+        # Heartbeat HTTP can block for its read timeout. Stop owned execution
+        # independently at the last confirmed deadline during a network outage.
+        while not self.stop.wait(0.1):
+            with self.lock:
+                if getattr(self, 'active_task', None) and self.lease_expired():
+                    self.cancel.set()
+
+    def confirm_lease(self, message):
+        self.lease_deadline = datetime.fromisoformat(message['lease_expires_at'].replace('Z', '+00:00')).timestamp()
+        remaining = message.get('lease_remaining_ms')
+        if isinstance(remaining, (int, float)) and not isinstance(remaining, bool) and 0 <= remaining <= 900000:
+            seconds = max(0, remaining / 1000 - message.get('_request_elapsed_seconds', 0))
+        else: seconds = max(0, self.lease_deadline - time.time())  # Older coordinator compatibility.
+        self.lease_monotonic_deadline = time.monotonic() + seconds
+
+    def lease_expired(self):
+        deadline = getattr(self, 'lease_monotonic_deadline', None)
+        return time.monotonic() >= deadline if deadline is not None else time.time() >= self.lease_deadline
 
     def report(self, task, raw, duration):
         result_key = None
@@ -115,7 +142,7 @@ class WorkerAgent:
             except (APIError, requests.RequestException) as exc:
                 if isinstance(exc, APIError) and exc.status is not None and exc.status < 500 and exc.status != 429:
                     raise
-                if time.time() >= self.lease_deadline or self.cancel.is_set():
+                if self.lease_expired() or self.cancel.is_set():
                     raise TaskCancelled("Could not report results before lease expired") from exc
                 logger.warning("Result delivery interrupted; retrying")
                 self.stop.wait(2)
@@ -135,7 +162,7 @@ class WorkerAgent:
             if not stopped:
                 self.cancel.clear()
                 self.active_task = task
-                self.lease_deadline = datetime.fromisoformat(task["lease_expires_at"].replace("Z", "+00:00")).timestamp()
+                self.confirm_lease(task)
         if stopped:
             self.release_stopped_task(task)
             return
@@ -162,7 +189,7 @@ class WorkerAgent:
                 pass
 
     def start(self, once=False):
-        threading.Thread(target=self.local_stop_loop, daemon=True).start()
+        self.start_local_monitors()
         while not self.stop.is_set():
             try:
                 self.api.register(self.capabilities)
@@ -208,8 +235,29 @@ class WorkerAgent:
             self.stop.set()
             heartbeat.join(timeout=25)
 
+    def start_local_monitors(self):
+        if getattr(self, '_local_monitors_started', False): return
+        self._local_monitors_started = True
+        for loop in (self.local_stop_loop, self.owner_liveness_loop, self.lease_watchdog_loop):
+            threading.Thread(target=loop, daemon=True).start()
 
-if __name__ == "__main__":
+    def owner_liveness_loop(self):
+        """A crashed owner app must not leave an invisible computing agent."""
+        pid, created = os.environ.get('EWASTE_OWNER_PID'), os.environ.get('EWASTE_OWNER_CREATED')
+        if not pid or not created: return  # Independent development CLI.
+        import psutil
+        try:
+            owner = psutil.Process(int(pid))
+            if abs(owner.create_time() - float(created)) > 0.01:
+                self.shutdown(); return
+            while not self.stop.wait(0.5):
+                if not owner.is_running() or abs(owner.create_time() - float(created)) > 0.01:
+                    self.shutdown(); return
+        except (psutil.Error, ValueError): self.shutdown()
+
+
+def main():
+    prepare_external_programs()
     parser = argparse.ArgumentParser()
     parser.add_argument("--once", action="store_true", help="Process at most one assignment and exit")
     parser.add_argument("--preflight", action="store_true", help="Verify approved runtimes without enrollment; exit 1 if image inference is unavailable")
@@ -228,12 +276,16 @@ if __name__ == "__main__":
             print(json.dumps({"mode": Config.EXECUTION_MODE, "capabilities": capabilities,
                               "errors": executor.preflight_errors}, indent=2))
             ready = set(capabilities) == set(Config.RELEASE.images) if Config.RELEASE else 'image_inference' in capabilities
-            sys.exit(0 if ready else 1)
+            return 0 if ready else 1
         except Exception as error:
             print(json.dumps({"mode": Config.EXECUTION_MODE, "error": str(error)}))
-            sys.exit(1)
+            return 1
     with worker_lock():
         agent = WorkerAgent()
         signal.signal(signal.SIGINT, agent.shutdown)
         signal.signal(signal.SIGTERM, agent.shutdown)
         agent.start(once=args.once)
+    return 0
+
+
+if __name__ == '__main__': sys.exit(main())

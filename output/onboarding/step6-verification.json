@@ -1,0 +1,97 @@
+{
+  "date_utc": "2026-10-10T05:51:19.888614+00:00",
+  "status": "PASSED_LOCAL_ACCEPTANCE",
+  "implementation": "Step 6 Windows packaging complete; Step 7 local simulation complete; physical acceptance pending",
+  "build": {
+    "version": "0.6.1",
+    "built_at_utc": "2026-10-10T05:37:14.927626+00:00",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "python": "3.12.6",
+    "nsis": "v3.13",
+    "pyinstaller": "6.22.3",
+    "unsigned_development_release": true,
+    "source_commit": "bd9271b521403a2981bb7244b06a0fb71573812f",
+    "source_has_changes": true,
+    "source_input_sha256": "d3bac3a9dcb5bfb2af1ca48744af69d62bb6cc1f0304c0d0b11c9fe6d6bc9a52",
+    "release_manifest_sha256": "38fb4564369666ce7d2ed9802dfd641cccb6c22f40e9197105cc1a08912837e1"
+  },
+  "artifacts": {
+    "EWasteGridWorker-0.6.1-Windows-amd64-Setup.exe": {
+      "bytes": 22334464,
+      "sha256": "9944bcd05958125dc67d5784114172bc4d2ad73d2c700f484b30041419a38f27"
+    },
+    "EWasteGridWorker-0.6.1-Windows-amd64-Portable.zip": {
+      "bytes": 22950643,
+      "sha256": "1637b6d7d2b5f5f2a71ee1b9128d6b965a9593047d921bc17c82b01c2caab4cc"
+    }
+  },
+  "tests": {
+    "worker": {
+      "passed": 97,
+      "skipped": 0
+    },
+    "backend": {
+      "passed": 33,
+      "skipped": 0
+    },
+    "workloads": {
+      "passed": 32,
+      "skipped": 0
+    }
+  },
+  "component_reports": {
+    "step6-gui-smoke": "PASSED",
+    "step6-installer-lifecycle": "PASSED",
+    "step6-packaged-job": "PASSED",
+    "step7-local-five-worker": "PASSED"
+  },
+  "packaged_job": {
+    "job_id": "d74163e3-97b4-4531-aa72-9c4ae7eff2dc",
+    "status": "COMPLETED",
+    "tasks": 2,
+    "images": 10,
+    "exact_input_coverage": true,
+    "errors": 0,
+    "task_ids": [
+      "50a8bb28-477a-4021-9e7a-ee1980cc857d",
+      "70a4408f-ab69-4d9b-949f-4aa0f6c2233d"
+    ],
+    "metric_type": "ESTIMATED",
+    "scope": "Downloaded job accounting/structure; not visual label accuracy or physical-machine evidence."
+  },
+  "single_pc_fleet": {
+    "workers_started": 5,
+    "images": 60,
+    "tasks": 30,
+    "accepted_tasks_per_worker": {
+      "1": 0,
+      "2": 7,
+      "3": 7,
+      "4": 8,
+      "5": 8
+    },
+    "one_worker_deliberately_crashed": true,
+    "real_concurrent_docker_execution": true,
+    "owned_containers_after_stop": 0,
+    "unrelated_container_survived": true,
+    "scope": "5 REAL frozen helpers on ONE Windows PC; isolated DB/API/Docker; approvals simulated; no physical laptop or speedup claim"
+  },
+  "pending": [
+    "Step 5 separate-laptop job record",
+    "Clean machine without Python/source",
+    "Real login/reboot",
+    "Another Windows account/device",
+    "Physical LAN fleet and network failure",
+    "Active upgrade/uninstall across transfers/inference/upload",
+    "Environmental failure/repair and supported rollback checks",
+    "Remote run of new Windows packaging CI"
+  ],
+  "not_claimed": [
+    "100% reliability",
+    "Physical-device speedup",
+    "Measured energy savings",
+    "AWS deployment",
+    "Waste-category model"
+  ],
+  "source_changes_committed_or_pushed": false
+}

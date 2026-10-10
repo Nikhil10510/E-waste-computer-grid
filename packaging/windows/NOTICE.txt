@@ -1,0 +1,17 @@
+E-Waste Grid Worker - team prototype, Windows amd64
+
+This unsigned development release bundles the owner app, Python and its
+dependencies. Docker Desktop/WSL with Linux amd64 containers is an external
+prerequisite. Workload images are a separately verified offline archive.
+
+Opening the app or enabling login startup does not start job computation.
+Only an owner-approved identity may start the worker. Close/Exit stops owned
+activity; explicit Minimize to tray may continue participation.
+
+Uninstall preserves protected per-user identity/settings/logs. Reinstall under
+the same Windows account can reconnect. Uninstall does not revoke the server
+identity and does not remove shared Docker images, Docker or database data.
+
+THIRD_PARTY_INVENTORY.json and third_party_notices contain collected dependency
+metadata and license texts. The build metadata is provided for review; it is
+not a claim of code signing, certification, model accuracy or energy savings.

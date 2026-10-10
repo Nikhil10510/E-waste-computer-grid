@@ -1,0 +1,12 @@
+{
+  "status": "PASSED",
+  "checks": {
+    "tk_widgets_and_bundled_tcl": true,
+    "no_approval_no_agent_no_identity": true,
+    "real_tray_hides_window_after_ready": true,
+    "duplicate_launch_restores_same_window": true,
+    "startup_toggle_on_isolated_registry_key": true,
+    "tray_exit_stops_icon_without_computing": true
+  },
+  "scope": "Real local Tk/tray and duplicate process, isolated startup key; no physical laptop/reboot/owner approval claim"
+}

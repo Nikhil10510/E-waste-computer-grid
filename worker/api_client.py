@@ -60,12 +60,16 @@ class APIClient:
         last_error = None
         for attempt in range(attempts):
             try:
+                started = time.monotonic()
                 # Per-call sessions avoid sharing mutable requests.Session state with the heartbeat thread.
                 response = requests.request(method, self.base_url + path, json=payload, headers=auth, timeout=(5, 20), allow_redirects=False)
                 if response.status_code == 204:
                     return None
                 if 200 <= response.status_code < 300:
-                    return response.json()
+                    data = response.json()
+                    if isinstance(data, dict) and 'lease_remaining_ms' in data:
+                        data['_request_elapsed_seconds'] = time.monotonic() - started
+                    return data
                 try:
                     message = response.json().get("error", response.reason)
                 except ValueError:

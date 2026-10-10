@@ -1,0 +1,82 @@
+{
+  "date_utc": "2026-10-10T10:51:15.102548+00:00",
+  "status": "PASSED",
+  "scope": "Local Windows software checks; no separate physical laptop, real sign-in, AWS deployment or trained waste classifier acceptance",
+  "tests": {
+    "worker": {
+      "passed": 100,
+      "failed": 0,
+      "log_sha256": "99fd070420f429a7e6958041e613b5f0473bca37f30a8da4b6789e26e705b483"
+    },
+    "workload": {
+      "passed": 32,
+      "failed": 0,
+      "log_sha256": "69c1ecd24f25d8b7c5528825d6000e2509a31b18891b4e0e67463ebb4c7afb5a"
+    },
+    "backend": {
+      "passed": 41,
+      "failed": 0,
+      "log_sha256": "e793fc7220b2a97383fb059738be18e9aaada1c901188fbd7085549433ec166c"
+    }
+  },
+  "frontend": {
+    "production_build": "PASSED",
+    "lint": "PASSED",
+    "browser_fixture": "Synthetic UI results; pagination, retry attribution, per-image errors, cancellation, stale state and disconnect checked"
+  },
+  "release": {
+    "build": {
+      "version": "0.6.2",
+      "built_at_utc": "2026-10-10T09:39:13.328665+00:00",
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.12.6",
+      "nsis": "v3.13",
+      "pyinstaller": "6.22.3",
+      "unsigned_development_release": true,
+      "source_commit": "bd9271b521403a2981bb7244b06a0fb71573812f",
+      "source_has_changes": true,
+      "source_input_sha256": "09b3c185e4ae0d06c39c438994101e20b8bc8649340763c04ee077ea852062c8",
+      "release_manifest_sha256": "38fb4564369666ce7d2ed9802dfd641cccb6c22f40e9197105cc1a08912837e1"
+    },
+    "artifacts": {
+      "EWasteGridWorker-0.6.2-Windows-amd64-Setup.exe": {
+        "bytes": 22336891,
+        "sha256": "abfd45559ac693d3a7a9224a2f8321febfa4782d115338ea4f2e9db5735c568d"
+      },
+      "EWasteGridWorker-0.6.2-Windows-amd64-Portable.zip": {
+        "bytes": 22951951,
+        "sha256": "7a62f62c7da8940f009760973a00016de9a9c7c05ef782c4e6c0bd9b07268914"
+      }
+    }
+  },
+  "helper_sha256": "8a33b6390d22b4219cd4739fa7ff703d3b188bf7d33b60a3c4be644918ff0487",
+  "reports": {
+    "remaining-five-worker": {
+      "sha256": "9de4f9eb4c26638d251a9bb1ae8fd81a8c871b430a288085f75bf60ce3e206e3",
+      "scope": "5 REAL frozen helpers on ONE Windows PC; isolated DB/API/Docker; approvals simulated; no physical laptop or speedup claim",
+      "status": "PASSED"
+    },
+    "remaining-network": {
+      "sha256": "afd9818f35a85d9733491dae1ef945556a087b67ffc7d3c6f9a4b24cca4e0684",
+      "scope": "Two real frozen helpers on ONE PC; blocked loopback proxy and paused owned container; not physical LAN",
+      "status": "PASSED"
+    },
+    "remaining-installer": {
+      "sha256": "08b55e9fe6537ed366f6619f52dc57c3737c354f8d8a2fe7b80a7006bf532b90",
+      "scope": "Real same-account Windows installer, upgrade and uninstall; private app state; no clean PC/reboot/another-account claim",
+      "status": "PASSED"
+    }
+  },
+  "screenshots": {
+    "remaining-dashboard.png": "5836f67fa71510734a3796cb3565ec9cb906276fbba34d3cd266908f698afe9d",
+    "remaining-cancellation.png": "9df957ab476fcd9bcc7f6881e89546894cf7a5b96e495cd025c5b8e6daa50d82"
+  },
+  "source_bundle_sha256": "784ba27457a718f32947bee50508829a936a41b8f974af98dc3a29938fed9a19",
+  "remaining": [
+    "Physical two-to-five-laptop LAN acceptance",
+    "Clean PC / another account / real sign-in and active-install release matrix",
+    "Validated waste classifier",
+    "Public AWS/HTTPS/S3 deployment and production operations",
+    "Physical speedup / metered energy / reuse evidence"
+  ]
+}

@@ -18,6 +18,27 @@ from task_executor import TaskExecutor, TaskCancelled
 
 
 class WorkerTests(unittest.TestCase):
+    def test_watchdog_cancels_expired_lease_without_waiting_for_heartbeat_network(self):
+        agent = WorkerAgent.__new__(WorkerAgent)
+        agent.lock = threading.RLock(); agent.stop, agent.cancel = threading.Event(), threading.Event()
+        agent.active_task = {'task_id': 'owned'}
+        agent.lease_deadline = time.time() + 600
+        agent.lease_monotonic_deadline = time.monotonic() + 0.05
+        watchdog = threading.Thread(target=agent.lease_watchdog_loop)
+        watchdog.start()
+        try: self.assertTrue(agent.cancel.wait(0.6))
+        finally: agent.stop.set(); watchdog.join(1)
+        self.assertFalse(watchdog.is_alive())
+
+    def test_confirmed_relative_lease_uses_monotonic_time_and_accounts_for_request_delay(self):
+        agent = WorkerAgent.__new__(WorkerAgent)
+        with patch('agent.time.monotonic', return_value=100), patch('agent.time.time', return_value=999999999999):
+            agent.confirm_lease({'lease_expires_at': '2026-10-10T00:00:00Z', 'lease_remaining_ms': 5000, '_request_elapsed_seconds': 2})
+            self.assertEqual(agent.lease_monotonic_deadline, 103)
+            self.assertFalse(agent.lease_expired())
+        with patch('agent.time.monotonic', return_value=104), patch('agent.time.time', return_value=0):
+            self.assertTrue(agent.lease_expired())
+
     def test_restart_authenticates_saved_identity_without_shared_enrollment(self):
         client = APIClient.__new__(APIClient)
         client.node_id, client.node_secret = 'approved-node', 'private-secret'
@@ -63,10 +84,21 @@ class WorkerTests(unittest.TestCase):
         order = []
         with patch('agent.APIClient'), patch('agent.TaskExecutor') as factory:
             factory.return_value.recover_containers.side_effect = lambda: order.append('recover')
-            factory.return_value.capabilities.side_effect = lambda: order.append('preflight') or ['dummy']
+            factory.return_value.capabilities.side_effect = lambda cancel: order.append('preflight') or ['dummy']
             agent = WorkerAgent()
+            agent.shutdown()
         self.assertEqual(order, ['recover', 'preflight'])
         self.assertEqual(agent.capabilities, ['dummy'])
+
+    def test_owner_stop_during_initial_runtime_probe_cancels_before_enrollment(self):
+        with tempfile.TemporaryDirectory() as temp, patch.object(Config, 'DATA_DIR', Path(temp)), patch('agent.APIClient') as client, patch('agent.TaskExecutor') as factory:
+            def preflight(cancel):
+                (Path(temp) / 'stop.request').write_text('stop')
+                self.assertTrue(cancel.wait(1))
+                raise TaskCancelled('Owner stopped startup')
+            factory.return_value.capabilities.side_effect = preflight
+            with self.assertRaises(TaskCancelled): WorkerAgent()
+            client.return_value.register.assert_not_called()
 
     def test_capabilities_only_advertise_runtimes_that_execute_successfully(self):
         executor = TaskExecutor.__new__(TaskExecutor)

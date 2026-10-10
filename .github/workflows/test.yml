@@ -1,6 +1,25 @@
 name: Grid checks
 on: [push, pull_request]
 jobs:
+  windows-package:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Get checksum-verified portable compiler
+        shell: pwsh
+        run: ./scripts/Get-NsisCompiler.ps1
+      - name: Build unsigned Windows worker
+        shell: pwsh
+        run: ./scripts/Build-WindowsWorker.ps1 -NsisCompiler "$pwd/.build/tools/nsis-3.13/makensis.exe"
+      - name: Retain build artifacts (not physical-device acceptance)
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-windows-worker
+          path: output/installers/
+          retention-days: 14
   integration:
     runs-on: ubuntu-latest
     services:

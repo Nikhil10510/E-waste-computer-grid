@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-import { Activity, Cpu, Zap, CheckCircle, Server, Plus, Download, RefreshCw, LogOut } from 'lucide-react';
-import { downloadResults, fetchDashboardSync, inviteWorker, submitNewJob, uploadInput } from './services/api';
+import { Activity, Cpu, Zap, CheckCircle, Server, Plus, RefreshCw, LogOut } from 'lucide-react';
+import { fetchDashboardSync, inviteWorker, submitNewJob, uploadInput } from './services/api';
 import type { DashboardData, InputItem } from './services/api';
+import JobBrowser from './JobBrowser';
 import './App.css';
 
 function App() {
@@ -24,7 +25,9 @@ function App() {
   const [inviting, setInviting] = useState(false);
   const [inviteError, setInviteError] = useState('');
   const [inviteNotice, setInviteNotice] = useState('');
-  const invitePending = useRef(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const invitePending = useRef<AbortController | null>(null);
+  const submission = useRef<AbortController | null>(null);
   const pending = useRef<{ fingerprint: string; key: string } | null>(null);
   const uploaded = useRef(new Map<File, InputItem>());
 
@@ -36,7 +39,7 @@ function App() {
     const poll = async () => {
       try {
         const next = await fetchDashboardSync(token, AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]));
-        if (!stopped) { setData(next); setError(''); }
+        if (!stopped) { setData(next); setError(''); setLastUpdated(new Date()); }
       } catch (e) {
         if (!stopped) setError(e instanceof Error ? e.message : 'Could not connect to the control plane');
       } finally {
@@ -53,25 +56,35 @@ function App() {
     sessionStorage.setItem('grid-admin-token', value);
     setData(null); setError(''); setToken(value);
   };
-  const logout = () => { sessionStorage.removeItem('grid-admin-token'); setToken(''); setData(null); setError(''); };
+  useEffect(() => () => { submission.current?.abort(); invitePending.current?.abort(); }, []);
+  const logout = () => {
+    submission.current?.abort(); invitePending.current?.abort();
+    submission.current = null; invitePending.current = null; pending.current = null; uploaded.current.clear();
+    sessionStorage.removeItem('grid-admin-token'); setToken(''); setTokenInput(''); setData(null); setError('');
+    setSubmitting(false); setInviting(false); setUploadProgress(''); setNotice(''); setFormError('');
+    setInviteError(''); setInviteNotice(''); setPairingCode(''); setLastUpdated(null);
+  };
 
   const invite = async (event: FormEvent) => {
     event.preventDefault();
     if (invitePending.current) return;
-    invitePending.current = true; setInviting(true); setInviteError(''); setInviteNotice('');
+    const controller = new AbortController(); invitePending.current = controller;
+    setInviting(true); setInviteError(''); setInviteNotice('');
     try {
       const code = pairingCode.trim();
       if (!/^[A-Za-z0-9_-]{8}$/.test(code)) throw new Error('Enter the eight-character code exactly as shown, including capital letters.');
-      const invitation = await inviteWorker(code, token);
+      const invitation = await inviteWorker(code, token, controller.signal);
+      controller.signal.throwIfAborted();
       setInviteNotice(`Invitation sent to ${invitation.worker_name}. Waiting for its owner to approve in the worker app. The code expires at ${new Date(invitation.expires_at).toLocaleTimeString()}.`);
       setPairingCode('');
-    } catch (e) { setInviteError(e instanceof Error ? e.message : 'Could not send invitation. Retry the same code.'); }
-    finally { invitePending.current = false; setInviting(false); }
+    } catch (e) { if (!controller.signal.aborted) setInviteError(e instanceof Error ? e.message : 'Could not send invitation. Retry the same code.'); }
+    finally { if (invitePending.current === controller) { invitePending.current = null; setInviting(false); } }
   };
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (submitting) return;
+    if (submission.current) return;
+    const controller = new AbortController(); submission.current = controller;
     setSubmitting(true); setFormError(''); setNotice('');
     try {
       if (!Number.isInteger(chunkSize) || chunkSize < 1 || chunkSize > 100) throw new Error('Items per task must be an integer from 1 to 100');
@@ -88,7 +101,7 @@ function App() {
         for (const [index, file] of files.entries()) {
           setUploadProgress(`Uploading image ${index + 1} of ${files.length}…`);
           let input = uploaded.current.get(file);
-          if (!input) { input = await uploadInput(file, token); uploaded.current.set(file, input); }
+          if (!input) { input = await uploadInput(file, token, controller.signal); controller.signal.throwIfAborted(); uploaded.current.set(file, input); }
           inputs.push(input);
         }
         items = inputs;
@@ -96,14 +109,16 @@ function App() {
       const input = { name: jobName, workload_type: kind, items, chunk_size: chunkSize, min_ram_gb: kind === 'dummy' ? 0.25 : 2 };
       const fingerprint = JSON.stringify(input);
       if (pending.current?.fingerprint !== fingerprint) pending.current = { fingerprint, key: crypto.randomUUID() };
-      const job = await submitNewJob(input, token, pending.current.key);
+      controller.signal.throwIfAborted();
+      const job = await submitNewJob(input, token, pending.current.key, controller.signal);
+      controller.signal.throwIfAborted();
       pending.current = null;
       setNotice(`${job.name} submitted: ${job.totalTasks} tasks. Workers will pick them up automatically.`);
       setJobName(''); setRefresh(value => value + 1);
     } catch (e) {
-      setFormError(e instanceof Error ? e.message : 'Submission failed');
+      if (!controller.signal.aborted) setFormError(e instanceof Error ? e.message : 'Submission failed');
     } finally {
-      setSubmitting(false); setUploadProgress('');
+      if (submission.current === controller) { submission.current = null; setSubmitting(false); setUploadProgress(''); }
     }
   };
 
@@ -127,6 +142,7 @@ function App() {
         <div className="dashboard-title">
           <h1>E-Waste Compute Grid</h1>
           <p><span className={error ? 'connection-offline' : 'pulse-dot'} /> {error ? 'Connection interrupted' : data ? 'Connected to your grid' : 'Connecting…'}</p>
+          {lastUpdated && <small>Last refreshed: {lastUpdated.toLocaleTimeString()}</small>}
         </div>
         <button className="text-button" onClick={logout}><LogOut size={16} /> Disconnect</button>
       </header>
@@ -164,20 +180,7 @@ function App() {
               </table></div>
               {!data.nodes.length && <p className="empty-state">No workers registered. Start a worker agent to contribute compute.</p>}
             </section>
-            <section className="glass-panel jobs-section">
-              <h2 className="section-title">Recent jobs</h2>
-              {!data.workloads.recent_jobs.length && <p className="empty-state">Submit a demo or an image batch to get started.</p>}
-              <div className="jobs-list">{data.workloads.recent_jobs.map(job => {
-                const finished = job.completedTasks + job.failedTasks;
-                const progress = job.totalTasks ? Math.round(100 * finished / job.totalTasks) : 0;
-                return <article key={job.id} className="job-item">
-                  <div className="job-header"><h3 className="job-name">{job.name}</h3><span className={`job-status ${job.status}`}>{job.status.replaceAll('_', ' ')}</span></div>
-                  <div className="progress-bar" role="progressbar" aria-label={`${job.name} progress`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><div className="progress-fill" style={{ width: `${progress}%` }} /></div>
-                  <p className="progress-text">{job.completedTasks} completed · {job.failedTasks} failed · {job.totalTasks} total tasks</p>
-                  {['COMPLETED', 'PARTIAL_SUCCESS', 'FAILED'].includes(job.status) && <button className="text-button" onClick={() => void downloadResults(job.id, token).catch(e => setFormError(e.message))}><Download size={16} /> Download results</button>}
-                </article>;
-              })}</div>
-            </section>
+            <JobBrowser key={token} token={token} refresh={refresh} />
           </div>
           <section className="glass-panel submission-panel">
             <h2 className="section-title"><Plus size={22} /> New workload</h2>

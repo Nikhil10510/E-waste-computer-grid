@@ -1,0 +1,556 @@
+{
+  "date": "2026-10-10T10:46:47.559626+00:00",
+  "status": "PASSED",
+  "scope": "5 REAL frozen helpers on ONE Windows PC; isolated DB/API/Docker; approvals simulated; no physical laptop or speedup claim",
+  "helper_sha256": "8a33b6390d22b4219cd4739fa7ff703d3b188bf7d33b60a3c4be644918ff0487",
+  "checks": {
+    "no_agent_or_identity_before_fixture_approval": true,
+    "real_frozen_preflight_and_saved_limits": true,
+    "paused_helpers_accept_no_work": true,
+    "dashboard_history_explains_accepted_work_and_recovery": true,
+    "immutable_images_and_real_container_quotas": true,
+    "concurrent_execution_and_owned_helper_crash": true,
+    "same_identity_reconnect_after_crash": true,
+    "pause_survives_packaged_helper_restart": true,
+    "unavailable_docker_fails_preflight": true,
+    "frozen_helper_requires_approval_despite_environment_override": true,
+    "packaged_native_execution_refused": true,
+    "unrelated_running_container_survives_worker_cleanup": true,
+    "expired_attempt_retried_one_metric_per_task": true
+  },
+  "jobs": [
+    {
+      "job_id": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+      "status": "COMPLETED",
+      "tasks": 30,
+      "images": 60,
+      "exact_input_coverage": true,
+      "errors": 0,
+      "task_ids": [
+        "0504453f-1e3d-4c00-b037-47f1d578a0a3",
+        "062692e8-676c-4564-965c-c845e18ad6c4",
+        "1337ddb6-c9e5-4cea-8939-5ce61c37ed0c",
+        "2163740b-5e8e-41be-af74-343c0f248762",
+        "2d218fd6-7337-4345-8958-e80eb17ca6ae",
+        "2e5602ab-772e-4fa4-b533-90c311a7ae34",
+        "484c64cc-f651-4c75-affe-08adf554965d",
+        "6a8e4a3e-a593-4c58-b33e-f66fa5721bac",
+        "6d94c090-d275-4638-a2b3-3fa3d8abae29",
+        "72c3f2c2-e3a4-478d-be0e-36f6d0da6205",
+        "7358c4d6-2fce-484d-905c-405dcdb2c8b7",
+        "7cc67bdf-c9ef-44b8-8f93-e73151cc287f",
+        "7f5f9f84-e84e-45c0-a1fa-8cf659112ace",
+        "82047326-09c3-4666-b90e-8513a41ccd2f",
+        "840c5b5d-17a8-42f3-aa26-f5560a6c7c0e",
+        "84d13fc2-872a-4c28-b5a5-8370f2b44eaf",
+        "8831b418-c0e0-42a2-ab2a-f078de0a8c67",
+        "a037533a-54f2-467c-9599-997925c035ce",
+        "a795ef9c-0aa9-4841-acfa-905a50945c6c",
+        "aa03a889-17e0-4df8-8368-de183d784d92",
+        "afb4383c-b4dd-4a83-8f61-c35c7eec6fdc",
+        "b12a5f01-846a-4be3-a9bf-3d969cc6dd13",
+        "bda783f7-9a8c-4965-8b79-15536c0c9180",
+        "c19f42f2-fa23-4c39-a3a6-489a117b4ae3",
+        "cd913561-7d77-4f4a-90ea-a9a3140ee3cf",
+        "e4be63ad-b505-4374-ab2c-1048ea2f0492",
+        "e6ee5d98-d99c-47db-8382-68632d70e4a6",
+        "e81058c9-e80c-496e-8427-82b8013ec9b4",
+        "f1bcd285-70f6-4e58-9938-c66ddba106b4",
+        "f9a60ab1-b9e9-47a5-aecb-79c3717f7ec8"
+      ],
+      "metric_type": "ESTIMATED",
+      "scope": "Downloaded job accounting/structure; not visual label accuracy or physical-machine evidence."
+    }
+  ],
+  "fixture_timings": {
+    "lease_ms": 15000,
+    "offline_ms": 10000,
+    "heartbeat_seconds": 1
+  },
+  "job_summary": {
+    "job": {
+      "id": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+      "name": "Packaged worker acceptance",
+      "status": "COMPLETED",
+      "totalTasks": 30,
+      "completedTasks": 30,
+      "failedTasks": 0,
+      "createdAt": "2026-10-10T10:47:37.213Z",
+      "startedAt": "2026-10-10T10:47:41.080Z",
+      "completedAt": "2026-10-10T10:48:39.654Z",
+      "cancelledTasks": 0
+    },
+    "task_counts": {
+      "COMPLETED": 30
+    },
+    "items": {
+      "total": 60,
+      "processed": 60,
+      "failed": 0,
+      "cancelled": 0,
+      "pending": 0
+    },
+    "timing": {
+      "queue_wait_ms": 3867,
+      "elapsed_ms": 58574,
+      "cumulative_execution_ms": 211021,
+      "throughput_items_per_second": 1.0243452726465667
+    },
+    "metrics": {
+      "contributing_workers": 4,
+      "estimated_energy_wh": 7.620202777777777,
+      "metric_type": "ESTIMATED",
+      "scope": "Accepted successful execution only; excludes retries, staging, uploads and idle host energy"
+    },
+    "scheduling": {
+      "policy": "FIFO with capability and approved RAM eligibility; one active task per worker"
+    }
+  },
+  "observed_containers": [
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "49b5ea73-a191-4a15-a7ee-ad1090ee77e4"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "7c54c775-a723-4057-83d1-1b0fac31ca91"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "8f747ea2-9999-48b8-b57b-52e8aa5c266b"
+    },
+    {
+      "worker": 3,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "e8bcc5b0-8a13-4cab-a816-f0338575f4ec"
+    },
+    {
+      "worker": 1,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "b7c20746-7451-4bb7-87b7-9dc8ce181a1a"
+    },
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "4bef0d5d-78e7-46a9-a442-4d635ab74d30"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "b8296e4a-95cd-4d17-b101-5adb97125fa6"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "04b99a6f-bcec-429d-8ee3-388b2cd9e03a"
+    },
+    {
+      "worker": 3,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "697388d8-3e6d-49c0-9d54-1240257f6349"
+    },
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "bcdbf246-a81c-4150-b540-b6c18ba97a4d"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "9903d4ee-4ba2-414d-848b-4704b0a0e291"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "101021e0-bbdb-452f-ab9d-eeb831244f9d"
+    },
+    {
+      "worker": 3,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "ce16cc13-76dd-4fa9-86b4-d59454defb55"
+    },
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "fa9944b5-d2a3-40d1-8523-c8fabcccffd6"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "f7532872-4cf0-404d-8b20-c0b26cf58fcd"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "0d61bace-591b-426b-8495-0e1d2b2c5692"
+    },
+    {
+      "worker": 3,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "6e6b7e91-d9e3-4e2f-bf95-ae79e21fcd9d"
+    },
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "7504502e-f408-40cb-b98e-304602a5b546"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "0896a449-c0ec-48b0-b8db-e013424b4531"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "b539935e-2454-4f09-bbd8-5a564834a14c"
+    },
+    {
+      "worker": 3,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "1b30baa4-abd8-407b-9141-fb9c504772ad"
+    },
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "84eb5997-9dc6-45fd-bfd4-76bd3788945c"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "7a3dc9d1-225f-4ec5-bfe2-add6871c9918"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "527e92dc-6b79-45ba-8946-4d443895aec2"
+    },
+    {
+      "worker": 3,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "ccd6be2c-08e8-4581-b530-e15fdb54c50d"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "81b3d1aa-7c9f-4144-b61d-91a543c2c157"
+    },
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "0bee67da-6271-4e22-8fd5-a7503d2abc7d"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "fad24932-604e-46a6-b5af-31c9cfd55c54"
+    },
+    {
+      "worker": 3,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "18013b96-8eac-4c48-9c84-edbf54bd160b"
+    },
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "52a9c6a1-a13b-46f1-aec1-c5557b77fbe4"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "38a0fb5f-5d83-416e-91ed-fbb3d36e9afa"
+    }
+  ],
+  "owned_containers_after_stop": 0,
+  "unrelated_containers_preserved": true,
+  "accepted_counts": {
+    "nodes": 5,
+    "pairings": 5,
+    "tasks": 30,
+    "metrics": 30,
+    "ownership": [
+      {
+        "id": "7cc67bdf-c9ef-44b8-8f93-e73151cc287f",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "1fa6e3ad-9648-43fb-b9ba-46bfbd3cc858",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "7f5f9f84-e84e-45c0-a1fa-8cf659112ace",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "886b9323-041f-4e6d-990d-8355ef36ad7c",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "84d13fc2-872a-4c28-b5a5-8370f2b44eaf",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "886b9323-041f-4e6d-990d-8355ef36ad7c",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "bda783f7-9a8c-4965-8b79-15536c0c9180",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "705585f2-f2ab-4668-a496-fe0e645c1428",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "e81058c9-e80c-496e-8427-82b8013ec9b4",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "886b9323-041f-4e6d-990d-8355ef36ad7c",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "2e5602ab-772e-4fa4-b533-90c311a7ae34",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "15b6a078-7ddb-4c9b-9940-3dddb8ef7067",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "6d94c090-d275-4638-a2b3-3fa3d8abae29",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "886b9323-041f-4e6d-990d-8355ef36ad7c",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "062692e8-676c-4564-965c-c845e18ad6c4",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "705585f2-f2ab-4668-a496-fe0e645c1428",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "b12a5f01-846a-4be3-a9bf-3d969cc6dd13",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "1fa6e3ad-9648-43fb-b9ba-46bfbd3cc858",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "e6ee5d98-d99c-47db-8382-68632d70e4a6",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "705585f2-f2ab-4668-a496-fe0e645c1428",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "0504453f-1e3d-4c00-b037-47f1d578a0a3",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "15b6a078-7ddb-4c9b-9940-3dddb8ef7067",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "484c64cc-f651-4c75-affe-08adf554965d",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "705585f2-f2ab-4668-a496-fe0e645c1428",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "72c3f2c2-e3a4-478d-be0e-36f6d0da6205",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "15b6a078-7ddb-4c9b-9940-3dddb8ef7067",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "7358c4d6-2fce-484d-905c-405dcdb2c8b7",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "705585f2-f2ab-4668-a496-fe0e645c1428",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "840c5b5d-17a8-42f3-aa26-f5560a6c7c0e",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "705585f2-f2ab-4668-a496-fe0e645c1428",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "8831b418-c0e0-42a2-ab2a-f078de0a8c67",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "15b6a078-7ddb-4c9b-9940-3dddb8ef7067",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "1337ddb6-c9e5-4cea-8939-5ce61c37ed0c",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "1fa6e3ad-9648-43fb-b9ba-46bfbd3cc858",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "2163740b-5e8e-41be-af74-343c0f248762",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "886b9323-041f-4e6d-990d-8355ef36ad7c",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "6a8e4a3e-a593-4c58-b33e-f66fa5721bac",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "1fa6e3ad-9648-43fb-b9ba-46bfbd3cc858",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "2d218fd6-7337-4345-8958-e80eb17ca6ae",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "15b6a078-7ddb-4c9b-9940-3dddb8ef7067",
+        "status": "COMPLETED",
+        "retryCount": 1
+      },
+      {
+        "id": "82047326-09c3-4666-b90e-8513a41ccd2f",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "1fa6e3ad-9648-43fb-b9ba-46bfbd3cc858",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "a037533a-54f2-467c-9599-997925c035ce",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "1fa6e3ad-9648-43fb-b9ba-46bfbd3cc858",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "c19f42f2-fa23-4c39-a3a6-489a117b4ae3",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "886b9323-041f-4e6d-990d-8355ef36ad7c",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "a795ef9c-0aa9-4841-acfa-905a50945c6c",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "705585f2-f2ab-4668-a496-fe0e645c1428",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "aa03a889-17e0-4df8-8368-de183d784d92",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "886b9323-041f-4e6d-990d-8355ef36ad7c",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "f9a60ab1-b9e9-47a5-aecb-79c3717f7ec8",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "1fa6e3ad-9648-43fb-b9ba-46bfbd3cc858",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "afb4383c-b4dd-4a83-8f61-c35c7eec6fdc",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "15b6a078-7ddb-4c9b-9940-3dddb8ef7067",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "cd913561-7d77-4f4a-90ea-a9a3140ee3cf",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "15b6a078-7ddb-4c9b-9940-3dddb8ef7067",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "e4be63ad-b505-4374-ab2c-1048ea2f0492",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "1fa6e3ad-9648-43fb-b9ba-46bfbd3cc858",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "f1bcd285-70f6-4e58-9938-c66ddba106b4",
+        "jobId": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+        "nodeId": "15b6a078-7ddb-4c9b-9940-3dddb8ef7067",
+        "status": "COMPLETED",
+        "retryCount": 0
+      }
+    ]
+  },
+  "fixture_exit_code": 0,
+  "accepted_tasks_per_worker": {
+    "1": 0,
+    "2": 8,
+    "3": 7,
+    "4": 7,
+    "5": 8
+  }
+}

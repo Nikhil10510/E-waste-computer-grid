@@ -2,6 +2,11 @@
 
 ## Current checkpoint - 10 October 2026
 
+Latest update: Step 6 installer, frozen GUI/helper, tray, optional login startup
+and owned upgrade/uninstall are implemented and locally tested. Read
+[Windows release](WINDOWS_WORKER_RELEASE.md) and [physical acceptance](STEP7_PHYSICAL_ACCEPTANCE.md).
+The earlier checkpoint below retains historical counts and remaining work.
+
 Steps 1-4 passed their local acceptance gates. Step 5 offline distribution is
 implemented and has local import/pinned-Docker job evidence. The user reports
 real preflight passed on the separate Windows laptop; its approved job ownership

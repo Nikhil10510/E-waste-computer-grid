@@ -1,0 +1,440 @@
+{
+  "job_id": "c91bf994-a0c5-4a75-8536-febfba464f2f",
+  "name": "Packaged worker acceptance",
+  "status": "COMPLETED",
+  "total_tasks": 30,
+  "completed_tasks": 30,
+  "failed_tasks": 0,
+  "cancelled_tasks": 0,
+  "items_cancelled": 0,
+  "items_processed": 60,
+  "items_failed": 0,
+  "predictions": [
+    {
+      "image": "00020_2_astronaut.png",
+      "classId": 450,
+      "className": "bobsled",
+      "confidence": 0.3044,
+      "task_id": "7cc67bdf-c9ef-44b8-8f93-e73151cc287f"
+    },
+    {
+      "image": "00021_2_brick.png",
+      "classId": 807,
+      "className": "solar dish",
+      "confidence": 0.2362,
+      "task_id": "7cc67bdf-c9ef-44b8-8f93-e73151cc287f"
+    },
+    {
+      "image": "00016_1_coins.png",
+      "classId": 943,
+      "className": "cucumber",
+      "confidence": 0.6825,
+      "task_id": "7f5f9f84-e84e-45c0-a1fa-8cf659112ace"
+    },
+    {
+      "image": "00017_1_grass.png",
+      "classId": 363,
+      "className": "armadillo",
+      "confidence": 0.073,
+      "task_id": "7f5f9f84-e84e-45c0-a1fa-8cf659112ace"
+    },
+    {
+      "image": "00030_3_astronaut.png",
+      "classId": 450,
+      "className": "bobsled",
+      "confidence": 0.3044,
+      "task_id": "84d13fc2-872a-4c28-b5a5-8370f2b44eaf"
+    },
+    {
+      "image": "00031_3_brick.png",
+      "classId": 807,
+      "className": "solar dish",
+      "confidence": 0.2362,
+      "task_id": "84d13fc2-872a-4c28-b5a5-8370f2b44eaf"
+    },
+    {
+      "image": "00012_1_camera.png",
+      "classId": 872,
+      "className": "tripod",
+      "confidence": 0.9972,
+      "task_id": "bda783f7-9a8c-4965-8b79-15536c0c9180"
+    },
+    {
+      "image": "00013_1_chelsea.png",
+      "classId": 285,
+      "className": "Egyptian cat",
+      "confidence": 0.7451,
+      "task_id": "bda783f7-9a8c-4965-8b79-15536c0c9180"
+    },
+    {
+      "image": "00022_2_camera.png",
+      "classId": 872,
+      "className": "tripod",
+      "confidence": 0.9972,
+      "task_id": "e81058c9-e80c-496e-8427-82b8013ec9b4"
+    },
+    {
+      "image": "00023_2_chelsea.png",
+      "classId": 285,
+      "className": "Egyptian cat",
+      "confidence": 0.7451,
+      "task_id": "e81058c9-e80c-496e-8427-82b8013ec9b4"
+    },
+    {
+      "image": "00034_3_clock_motion.png",
+      "classId": 818,
+      "className": "spotlight",
+      "confidence": 0.8267,
+      "task_id": "2e5602ab-772e-4fa4-b533-90c311a7ae34"
+    },
+    {
+      "image": "00035_3_coffee.png",
+      "classId": 967,
+      "className": "espresso",
+      "confidence": 0.9907,
+      "task_id": "2e5602ab-772e-4fa4-b533-90c311a7ae34"
+    },
+    {
+      "image": "00028_2_gravel.png",
+      "classId": 533,
+      "className": "dishrag",
+      "confidence": 0.4859,
+      "task_id": "6d94c090-d275-4638-a2b3-3fa3d8abae29"
+    },
+    {
+      "image": "00029_2_rocket.jpg",
+      "classId": 682,
+      "className": "obelisk",
+      "confidence": 0.4951,
+      "task_id": "6d94c090-d275-4638-a2b3-3fa3d8abae29"
+    },
+    {
+      "image": "00004_0_clock_motion.png",
+      "classId": 818,
+      "className": "spotlight",
+      "confidence": 0.8267,
+      "task_id": "062692e8-676c-4564-965c-c845e18ad6c4"
+    },
+    {
+      "image": "00005_0_coffee.png",
+      "classId": 967,
+      "className": "espresso",
+      "confidence": 0.9907,
+      "task_id": "062692e8-676c-4564-965c-c845e18ad6c4"
+    },
+    {
+      "image": "00036_3_coins.png",
+      "classId": 943,
+      "className": "cucumber",
+      "confidence": 0.6825,
+      "task_id": "b12a5f01-846a-4be3-a9bf-3d969cc6dd13"
+    },
+    {
+      "image": "00037_3_grass.png",
+      "classId": 363,
+      "className": "armadillo",
+      "confidence": 0.073,
+      "task_id": "b12a5f01-846a-4be3-a9bf-3d969cc6dd13"
+    },
+    {
+      "image": "00042_4_camera.png",
+      "classId": 872,
+      "className": "tripod",
+      "confidence": 0.9972,
+      "task_id": "e6ee5d98-d99c-47db-8382-68632d70e4a6"
+    },
+    {
+      "image": "00043_4_chelsea.png",
+      "classId": 285,
+      "className": "Egyptian cat",
+      "confidence": 0.7451,
+      "task_id": "e6ee5d98-d99c-47db-8382-68632d70e4a6"
+    },
+    {
+      "image": "00038_3_gravel.png",
+      "classId": 533,
+      "className": "dishrag",
+      "confidence": 0.4859,
+      "task_id": "0504453f-1e3d-4c00-b037-47f1d578a0a3"
+    },
+    {
+      "image": "00039_3_rocket.jpg",
+      "classId": 682,
+      "className": "obelisk",
+      "confidence": 0.4951,
+      "task_id": "0504453f-1e3d-4c00-b037-47f1d578a0a3"
+    },
+    {
+      "image": "00040_4_astronaut.png",
+      "classId": 450,
+      "className": "bobsled",
+      "confidence": 0.3044,
+      "task_id": "484c64cc-f651-4c75-affe-08adf554965d"
+    },
+    {
+      "image": "00041_4_brick.png",
+      "classId": 807,
+      "className": "solar dish",
+      "confidence": 0.2362,
+      "task_id": "484c64cc-f651-4c75-affe-08adf554965d"
+    },
+    {
+      "image": "00006_0_coins.png",
+      "classId": 943,
+      "className": "cucumber",
+      "confidence": 0.6825,
+      "task_id": "72c3f2c2-e3a4-478d-be0e-36f6d0da6205"
+    },
+    {
+      "image": "00007_0_grass.png",
+      "classId": 363,
+      "className": "armadillo",
+      "confidence": 0.073,
+      "task_id": "72c3f2c2-e3a4-478d-be0e-36f6d0da6205"
+    },
+    {
+      "image": "00048_4_gravel.png",
+      "classId": 533,
+      "className": "dishrag",
+      "confidence": 0.4859,
+      "task_id": "7358c4d6-2fce-484d-905c-405dcdb2c8b7"
+    },
+    {
+      "image": "00049_4_rocket.jpg",
+      "classId": 682,
+      "className": "obelisk",
+      "confidence": 0.4951,
+      "task_id": "7358c4d6-2fce-484d-905c-405dcdb2c8b7"
+    },
+    {
+      "image": "00000_0_astronaut.png",
+      "classId": 450,
+      "className": "bobsled",
+      "confidence": 0.3044,
+      "task_id": "840c5b5d-17a8-42f3-aa26-f5560a6c7c0e"
+    },
+    {
+      "image": "00001_0_brick.png",
+      "classId": 807,
+      "className": "solar dish",
+      "confidence": 0.2362,
+      "task_id": "840c5b5d-17a8-42f3-aa26-f5560a6c7c0e"
+    },
+    {
+      "image": "00054_5_clock_motion.png",
+      "classId": 818,
+      "className": "spotlight",
+      "confidence": 0.8267,
+      "task_id": "8831b418-c0e0-42a2-ab2a-f078de0a8c67"
+    },
+    {
+      "image": "00055_5_coffee.png",
+      "classId": 967,
+      "className": "espresso",
+      "confidence": 0.9907,
+      "task_id": "8831b418-c0e0-42a2-ab2a-f078de0a8c67"
+    },
+    {
+      "image": "00008_0_gravel.png",
+      "classId": 533,
+      "className": "dishrag",
+      "confidence": 0.4859,
+      "task_id": "1337ddb6-c9e5-4cea-8939-5ce61c37ed0c"
+    },
+    {
+      "image": "00009_0_rocket.jpg",
+      "classId": 682,
+      "className": "obelisk",
+      "confidence": 0.4951,
+      "task_id": "1337ddb6-c9e5-4cea-8939-5ce61c37ed0c"
+    },
+    {
+      "image": "00044_4_clock_motion.png",
+      "classId": 818,
+      "className": "spotlight",
+      "confidence": 0.8267,
+      "task_id": "2163740b-5e8e-41be-af74-343c0f248762"
+    },
+    {
+      "image": "00045_4_coffee.png",
+      "classId": 967,
+      "className": "espresso",
+      "confidence": 0.9907,
+      "task_id": "2163740b-5e8e-41be-af74-343c0f248762"
+    },
+    {
+      "image": "00018_1_gravel.png",
+      "classId": 533,
+      "className": "dishrag",
+      "confidence": 0.4859,
+      "task_id": "6a8e4a3e-a593-4c58-b33e-f66fa5721bac"
+    },
+    {
+      "image": "00019_1_rocket.jpg",
+      "classId": 682,
+      "className": "obelisk",
+      "confidence": 0.4951,
+      "task_id": "6a8e4a3e-a593-4c58-b33e-f66fa5721bac"
+    },
+    {
+      "image": "00024_2_clock_motion.png",
+      "classId": 818,
+      "className": "spotlight",
+      "confidence": 0.8267,
+      "task_id": "2d218fd6-7337-4345-8958-e80eb17ca6ae"
+    },
+    {
+      "image": "00025_2_coffee.png",
+      "classId": 967,
+      "className": "espresso",
+      "confidence": 0.9907,
+      "task_id": "2d218fd6-7337-4345-8958-e80eb17ca6ae"
+    },
+    {
+      "image": "00058_5_gravel.png",
+      "classId": 533,
+      "className": "dishrag",
+      "confidence": 0.4859,
+      "task_id": "82047326-09c3-4666-b90e-8513a41ccd2f"
+    },
+    {
+      "image": "00059_5_rocket.jpg",
+      "classId": 682,
+      "className": "obelisk",
+      "confidence": 0.4951,
+      "task_id": "82047326-09c3-4666-b90e-8513a41ccd2f"
+    },
+    {
+      "image": "00002_0_camera.png",
+      "classId": 872,
+      "className": "tripod",
+      "confidence": 0.9972,
+      "task_id": "a037533a-54f2-467c-9599-997925c035ce"
+    },
+    {
+      "image": "00003_0_chelsea.png",
+      "classId": 285,
+      "className": "Egyptian cat",
+      "confidence": 0.7451,
+      "task_id": "a037533a-54f2-467c-9599-997925c035ce"
+    },
+    {
+      "image": "00050_5_astronaut.png",
+      "classId": 450,
+      "className": "bobsled",
+      "confidence": 0.3044,
+      "task_id": "c19f42f2-fa23-4c39-a3a6-489a117b4ae3"
+    },
+    {
+      "image": "00051_5_brick.png",
+      "classId": 807,
+      "className": "solar dish",
+      "confidence": 0.2362,
+      "task_id": "c19f42f2-fa23-4c39-a3a6-489a117b4ae3"
+    },
+    {
+      "image": "00014_1_clock_motion.png",
+      "classId": 818,
+      "className": "spotlight",
+      "confidence": 0.8267,
+      "task_id": "a795ef9c-0aa9-4841-acfa-905a50945c6c"
+    },
+    {
+      "image": "00015_1_coffee.png",
+      "classId": 967,
+      "className": "espresso",
+      "confidence": 0.9907,
+      "task_id": "a795ef9c-0aa9-4841-acfa-905a50945c6c"
+    },
+    {
+      "image": "00056_5_coins.png",
+      "classId": 943,
+      "className": "cucumber",
+      "confidence": 0.6825,
+      "task_id": "aa03a889-17e0-4df8-8368-de183d784d92"
+    },
+    {
+      "image": "00057_5_grass.png",
+      "classId": 363,
+      "className": "armadillo",
+      "confidence": 0.073,
+      "task_id": "aa03a889-17e0-4df8-8368-de183d784d92"
+    },
+    {
+      "image": "00046_4_coins.png",
+      "classId": 943,
+      "className": "cucumber",
+      "confidence": 0.6825,
+      "task_id": "f9a60ab1-b9e9-47a5-aecb-79c3717f7ec8"
+    },
+    {
+      "image": "00047_4_grass.png",
+      "classId": 363,
+      "className": "armadillo",
+      "confidence": 0.073,
+      "task_id": "f9a60ab1-b9e9-47a5-aecb-79c3717f7ec8"
+    },
+    {
+      "image": "00052_5_camera.png",
+      "classId": 872,
+      "className": "tripod",
+      "confidence": 0.9972,
+      "task_id": "afb4383c-b4dd-4a83-8f61-c35c7eec6fdc"
+    },
+    {
+      "image": "00053_5_chelsea.png",
+      "classId": 285,
+      "className": "Egyptian cat",
+      "confidence": 0.7451,
+      "task_id": "afb4383c-b4dd-4a83-8f61-c35c7eec6fdc"
+    },
+    {
+      "image": "00010_1_astronaut.png",
+      "classId": 450,
+      "className": "bobsled",
+      "confidence": 0.3044,
+      "task_id": "cd913561-7d77-4f4a-90ea-a9a3140ee3cf"
+    },
+    {
+      "image": "00011_1_brick.png",
+      "classId": 807,
+      "className": "solar dish",
+      "confidence": 0.2362,
+      "task_id": "cd913561-7d77-4f4a-90ea-a9a3140ee3cf"
+    },
+    {
+      "image": "00032_3_camera.png",
+      "classId": 872,
+      "className": "tripod",
+      "confidence": 0.9972,
+      "task_id": "e4be63ad-b505-4374-ab2c-1048ea2f0492"
+    },
+    {
+      "image": "00033_3_chelsea.png",
+      "classId": 285,
+      "className": "Egyptian cat",
+      "confidence": 0.7451,
+      "task_id": "e4be63ad-b505-4374-ab2c-1048ea2f0492"
+    },
+    {
+      "image": "00026_2_coins.png",
+      "classId": 943,
+      "className": "cucumber",
+      "confidence": 0.6825,
+      "task_id": "f1bcd285-70f6-4e58-9938-c66ddba106b4"
+    },
+    {
+      "image": "00027_2_grass.png",
+      "classId": 363,
+      "className": "armadillo",
+      "confidence": 0.073,
+      "task_id": "f1bcd285-70f6-4e58-9938-c66ddba106b4"
+    }
+  ],
+  "errors": [],
+  "metrics": {
+    "estimated_energy_wh": 7.620202777777777,
+    "execution_time_ms": 211021,
+    "metric_type": "ESTIMATED"
+  }
+}

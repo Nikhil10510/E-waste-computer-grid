@@ -105,6 +105,106 @@ describe('real PostgreSQL and HTTP integration', { skip: !process.env.TEST_DATAB
       child.on('close', code => { clearTimeout(timer); code === 0 ? resolve(output) : reject(new Error(output)); });
     });
   }
+
+  test('assignment history survives retries, duplicate claims and concurrent completion without leaking credentials', async () => {
+    const first = await register({ name: 'Laptop A' }), second = await register({ name: 'Laptop B' });
+    const created = await job(['one', 'two']);
+    const task = await take(first);
+    assert.equal((await take(first)).lease_token, task.lease_token);
+    assert.equal(await prisma.taskAttempt.count(), 1);
+    const failed = await api('POST', `/api/tasks/${task.task_id}/fail`, { lease_token: task.lease_token,
+      error: 'Download https://storage.test/item?signature=private-signature Bearer private-token integration-admin', retryable: true }, first);
+    assert.equal(failed.body.status, 'REQUEUED');
+    const retry = await take(second);
+    assert.equal(retry.task_id, task.task_id);
+    assert.equal(retry.retry_count, 1);
+    const uploaded = await upload(second, retry);
+    const replies = await Promise.all([complete(second, retry, uploaded.result_key), complete(second, retry, uploaded.result_key)]);
+    assert.ok(replies.every(r => r.status === 200), JSON.stringify(replies));
+    const detail = await api('GET', `/api/tasks/${task.task_id}`);
+    assert.equal(detail.body.total_attempts, 2);
+    assert.deepEqual(detail.body.task.attempts.map(a => [a.worker_name, a.status]), [['Laptop A', 'REQUEUED'], ['Laptop B', 'COMPLETED']]);
+    for (const secret of [first.node_secret, second.node_secret, task.lease_token, retry.lease_token, 'private-signature', 'private-token', 'integration-admin'])
+      assert.ok(!JSON.stringify(detail.body).includes(secret), secret);
+    assert.equal(detail.body.items[0].status, 'PROCESSED');
+    const summary = (await api('GET', `/api/jobs/${created.id}`)).body;
+    assert.equal(summary.items.processed, 1); assert.equal(summary.items.pending, 1);
+    assert.equal(summary.metrics.contributing_workers, 1);
+    assert.equal(summary.timing.cumulative_execution_ms, 1000);
+    assert.ok(summary.job.startedAt);
+    assert.equal(summary.job.requestKey, undefined);
+    assert.equal((await api('GET', `/api/jobs/${created.id}/tasks?page=2&limit=1`)).body.tasks.length, 1);
+    assert.equal((await api('GET', `/api/jobs/${created.id}/tasks?limit=101`)).status, 400);
+    assert.equal((await api('GET', '/api/jobs?page=1e3')).status, 400);
+    assert.equal((await api('GET', '/api/jobs?page=1&page=2')).status, 400);
+    assert.equal((await api('GET', `/api/tasks/${task.task_id}`, undefined, first)).status, 401);
+  });
+
+  test('cancellation retains accepted results, fences assigned attempts and counts every cancelled input', async () => {
+    const node = await register(); const created = await job(['one', 'two', 'three']);
+    const done = await take(node); const stored = await upload(node, done); await complete(node, done, stored.result_key);
+    const active = await take(node); const late = await upload(node, active);
+    assert.equal((await api('POST', `/api/jobs/${created.id}/cancel`, {}, node)).status, 401);
+    const cancelled = await api('POST', `/api/jobs/${created.id}/cancel`, {});
+    assert.equal(cancelled.body.status, 'CANCELLED'); assert.equal(cancelled.body.cancelledTasks, 2);
+    assert.equal((await api('POST', `/api/jobs/${created.id}/cancel`, {})).body.cancelledTasks, 2);
+    assert.equal((await complete(node, active, late.result_key)).status, 409);
+    assert.equal((await api('POST', `/api/nodes/${node.node_id}/heartbeat`, { state: 'WORKING', active_task_id: active.task_id, lease_token: active.lease_token }, node)).body.action, 'CANCEL_TASK');
+    assert.equal((await api('GET', '/api/tasks/request', undefined, node)).status, 204);
+    await sweep();
+    const result = (await api('GET', `/api/jobs/${created.id}/results`)).body;
+    assert.equal(result.items_processed, 1); assert.equal(result.items_cancelled, 2); assert.equal(result.items_failed, 0);
+    assert.equal(new Set([...result.predictions, ...result.errors].map(i => i.image)).size, 3);
+    assert.equal(await prisma.metric.count(), 1);
+    const history = (await api('GET', `/api/tasks/${active.task_id}`)).body;
+    assert.equal(history.task.attempts[0].status, 'CANCELLED');
+    const summary = (await api('GET', `/api/jobs/${created.id}`)).body;
+    assert.equal(summary.items.pending, 0); assert.equal(summary.items.cancelled, 2);
+  });
+
+  test('cancellation racing claims/completions never leaves assigned work or duplicate metrics', async () => {
+    const nodes = await Promise.all(Array.from({ length: 4 }, (_, i) => register({ name: `Race ${i}` })));
+    const created = await job(Array.from({ length: 8 }, (_, i) => `item ${i}`));
+    const active = await Promise.all(nodes.map(take));
+    const uploads = await Promise.all(active.map((t, i) => upload(nodes[i], t)));
+    const replies = await Promise.all([api('POST', `/api/jobs/${created.id}/cancel`, {}),
+      ...active.map((t, i) => complete(nodes[i], t, uploads[i].result_key))]);
+    assert.equal(replies[0].status, 200, JSON.stringify(replies));
+    assert.ok(replies.slice(1).every(r => [200, 409].includes(r.status)), JSON.stringify(replies));
+    const tasks = await prisma.task.findMany({ where: { jobId: created.id } });
+    assert.ok(tasks.every(t => ['COMPLETED', 'CANCELLED'].includes(t.status)));
+    assert.equal(await prisma.metric.count(), tasks.filter(t => t.status === 'COMPLETED').length);
+    const detail = (await api('GET', `/api/jobs/${created.id}`)).body;
+    assert.equal(detail.job.completedTasks + detail.job.cancelledTasks, 8);
+    assert.equal(detail.job.status, 'CANCELLED');
+    assert.ok((await Promise.all(nodes.map(n => api('GET', '/api/tasks/request', undefined, n)))).every(r => r.status === 204));
+  });
+
+  test('expired attempt history is closed exactly once and a terminal failure names each input', async () => {
+    const node = await register(); const created = await job(['one', 'two'], { chunk_size: 2 });
+    const active = await take(node);
+    await prisma.task.update({ where: { id: active.task_id }, data: { leaseExpiresAt: new Date(0) } });
+    await Promise.all([sweep(), sweep()]);
+    assert.equal((await prisma.taskAttempt.findFirst()).status, 'REQUEUED');
+    const retry = await take(node);
+    assert.equal((await api('POST', `/api/tasks/${retry.task_id}/fail`, { lease_token: retry.lease_token, error: 'Bad input', retryable: false }, node)).status, 200);
+    const result = (await api('GET', `/api/jobs/${created.id}/results`)).body;
+    assert.equal(result.items_failed, 2); assert.equal(result.errors.length, 2);
+    assert.equal(new Set(result.errors.map(e => e.image)).size, 2);
+    const history = (await api('GET', `/api/tasks/${retry.task_id}`)).body;
+    assert.deepEqual(history.task.attempts.map(a => a.status), ['REQUEUED', 'FAILED']);
+  });
+
+  test('readiness reports unavailable database without affecting liveness or leaking an error', async () => {
+    assert.equal((await api('GET', '/api/ready')).body.status, 'ready');
+    const previous = prisma.$queryRaw;
+    prisma.$queryRaw = async () => { throw new Error('postgresql://private-password@host'); };
+    try {
+      const reply = await api('GET', '/api/ready'); assert.equal(reply.status, 503);
+      assert.equal(reply.body.status, 'not_ready'); assert.ok(!JSON.stringify(reply).includes('private-password'));
+      assert.equal((await api('GET', '/api/live')).body.status, 'alive');
+    } finally { prisma.$queryRaw = previous; }
+  });
   function runPairingClient(suffix, operation) {
     const python = process.env.TEST_PYTHON;
     assert.ok(python, 'TEST_PYTHON must point to the current fresh Python runtime');

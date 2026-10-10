@@ -5,6 +5,12 @@ inputs, executes approved workloads, uploads JSON and reports completion.
 Each old laptop needs this agent and a supported runtime installed once; nobody
 needs to manually process individual photos on it.
 
+Windows worker-only laptops can now use the bundled 0.6.2 installer without
+Python/source. Docker Desktop/WSL and the matching offline archive are still
+required. See [packaged app usage](../docs/WINDOWS_WORKER_RELEASE.md). Source
+commands below remain useful for development; packaged enrollment uses owner
+approval, not the development enrollment token.
+
 ## Prepare from the repository root
 
 Use a fresh Python environment; virtual environments copied from another machine

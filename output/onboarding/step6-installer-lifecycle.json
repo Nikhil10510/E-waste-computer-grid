@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-10T05:47:30.899884+00:00",
+  "status": "PASSED",
+  "checks": {
+    "previous_real_release_installed_in_path_with_spaces": true,
+    "upgrade_gracefully_closes_existing_gui": true,
+    "upgrade_preserves_dpapi_identity_limits_and_pause_byte_for_byte": true,
+    "installed_frozen_gui_and_tray_smoke": true,
+    "uninstall_closes_gui_and_removes_owned_files_shortcuts_registry": true,
+    "uninstall_retains_protected_user_state": true,
+    "unrelated_owned_test_process_survives_install_upgrade_uninstall": true
+  },
+  "installer_sha256": "9944bcd05958125dc67d5784114172bc4d2ad73d2c700f484b30041419a38f27",
+  "scope": "Real same-account Windows installer, upgrade and uninstall; private app state; no clean PC/reboot/another-account claim",
+  "installed_version": "0.6.1",
+  "gui_sha256": "f59213684f2ba23b51b46adf57f0de250d34168a85b50064caaab69e12e629cf"
+}

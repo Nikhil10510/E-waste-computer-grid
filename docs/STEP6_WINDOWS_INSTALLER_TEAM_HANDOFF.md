@@ -2,6 +2,12 @@
 
 Snapshot: 10 October 2026. Documentation only; implementation pending.
 
+Later checkpoint on the same date: Step 6 implementation/local acceptance is
+now available. Read [Windows release](WINDOWS_WORKER_RELEASE.md),
+`output/onboarding/step6-acceptance.md` and [physical acceptance](STEP7_PHYSICAL_ACCEPTANCE.md).
+This document and its exported PDF retain the earlier planning snapshot; the
+current source and dated evidence supersede statements that no installer exists.
+
 ## 01 / Step 6: build the Windows release
 
 ### Objective

@@ -13,6 +13,18 @@ separate verification milestones.
 
 ## Prerequisites and source
 
+**Latest software checkpoint:** Windows worker 0.6.2, task/attempt history,
+per-image results, job cancellation and safe database migrations are implemented.
+Read [completion, upgrade and remaining work](docs/SOFTWARE_COMPLETION.md) before
+resuming from an earlier PDF. Physical laptop acceptance is still pending.
+
+**Windows owner app update (10 October 2026):** Step 6 packaging is implemented
+and locally tested. Worker-only laptops can use the bundled EXE installer plus
+the verified offline archive; they need Docker/WSL, but no system Python/source.
+See [Windows release and usage](docs/WINDOWS_WORKER_RELEASE.md) and
+[remaining physical acceptance](docs/STEP7_PHYSICAL_ACCEPTANCE.md). The source
+commands below still apply to development/coordinator setup.
+
 - Docker Desktop/Engine running with Linux containers and Docker Compose.
 - Python 3.12 installed for the host worker/model setup. Create environments on
   each machine; do not copy `.venv` or `.venv-local` between laptops.
@@ -20,13 +32,14 @@ separate verification milestones.
   use Node 22 and `npm ci` against the existing package locks.
 - A current source checkout from
   [the team's repository](https://github.com/dkush2024-dot/E-waste-computer-grid).
-  Onboarding Steps 1-4 and their local acceptance records are included. Steps 5-7
-  remain open; see the [team and AI handoff](output/pdf/E_Waste_Grid_Remaining_Work_Team_AI_Handoff.md).
+  Onboarding Steps 1-4, Step 5 offline implementation and Step 6 local packaging
+  are included. Separate-device, real-login and physical fleet acceptance remain
+  open; earlier PDF handoffs are historical snapshots.
 
 PowerShell commands below run from the repository root. If `py -3.12` is not
 configured, use the absolute path to an installed Python 3.12 executable instead.
-The current development machine has a working `.venv-local` from Phase 1, even
-though its Windows `py` launcher does not list an installed interpreter.
+Use a fresh virtual environment in your own checkout; a teammate's environment
+paths and interpreter setup are not portable.
 
 ## Prepare worker/model/data once
 
@@ -76,8 +89,8 @@ Secure pairing/approval is implemented at the API level. A source-based desktop
 approval preview and dashboard invitation form exist. Step 2 approval, decline,
 expiry, Docker computation, stop and saved-identity restart passed on the local
 Windows machine. Step 3 custom resource ceilings, pause/drain, restart and
-active stop/retry also passed local HTTP/Docker acceptance. Installer and
-separate-laptop acceptance remain pending. See
+active stop/retry also passed local HTTP/Docker acceptance. Installer acceptance
+passed locally; separate-laptop acceptance remains pending. See
 [worker onboarding status and protocol](docs/WORKER_ONBOARDING.md).
 Upgrade the backend before using the updated worker with a saved identity.
 The script flow below remains enabled for local development.

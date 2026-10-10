@@ -1,0 +1,511 @@
+{
+  "date": "2026-10-10T05:48:03.787969+00:00",
+  "status": "PASSED",
+  "scope": "5 REAL frozen helpers on ONE Windows PC; isolated DB/API/Docker; approvals simulated; no physical laptop or speedup claim",
+  "helper_sha256": "b6468fa369db417c155d6d203952087efbe5656bd3c024122b7d3941e407b335",
+  "checks": {
+    "no_agent_or_identity_before_fixture_approval": true,
+    "real_frozen_preflight_and_saved_limits": true,
+    "paused_helpers_accept_no_work": true,
+    "immutable_images_and_real_container_quotas": true,
+    "concurrent_execution_and_owned_helper_crash": true,
+    "same_identity_reconnect_after_crash": true,
+    "pause_survives_packaged_helper_restart": true,
+    "unavailable_docker_fails_preflight": true,
+    "frozen_helper_requires_approval_despite_environment_override": true,
+    "packaged_native_execution_refused": true,
+    "unrelated_running_container_survives_worker_cleanup": true,
+    "expired_attempt_retried_one_metric_per_task": true
+  },
+  "jobs": [
+    {
+      "job_id": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+      "status": "COMPLETED",
+      "tasks": 30,
+      "images": 60,
+      "exact_input_coverage": true,
+      "errors": 0,
+      "task_ids": [
+        "027ea623-5803-4912-8ee6-7ab640bd5a1e",
+        "100420a2-4efa-4e0f-9bc4-2e6f6655de02",
+        "106e6baa-faa3-4c60-a509-d12cefb7bfd0",
+        "248f421d-4bbf-4dce-aab2-3cb0efe8c17c",
+        "264b65f2-7842-4830-997c-10f980510048",
+        "2697fd04-7149-4fed-ade3-ff9db4847e9e",
+        "2de124bb-ac2d-40d2-99ff-19a5edd79ef2",
+        "2f40218d-2e97-4259-a33d-3911e18348cb",
+        "356759a8-d64a-4751-9fb0-c5ff76f48db5",
+        "3d831c6a-82b6-4a09-98b5-fde313953f12",
+        "4ca78a0b-3316-4f67-8dc3-948e425bdc4d",
+        "52405f88-1e50-4870-8219-dd1588aa1642",
+        "5ea34211-6525-463c-b7f7-1709b6d37ec4",
+        "646c513f-b694-4427-bfc0-2267ec0f9e4f",
+        "6facae91-d3c1-4160-883b-3e43f09a40f6",
+        "73131058-0fdc-4ed6-be62-2d7837824c8a",
+        "7a0f246a-dfc3-4bbe-8692-b98164713bb8",
+        "82d074e5-144e-4ec9-8422-33db3fb61122",
+        "83812144-7963-4007-bf7e-3404f0487acf",
+        "865b2211-585e-4baa-8109-522f2133d151",
+        "92b21f7e-e4d8-40d8-a058-f02d5e0a7349",
+        "94d0dfdf-8a01-420e-8e18-7af4602faf65",
+        "9acafd94-fcee-4d87-b13e-7e71437dd776",
+        "bb113349-6996-4c94-885c-53f0241ce919",
+        "c1c6c491-d9b3-4829-8140-976b948f4917",
+        "c220d946-73ce-49c3-8462-33be4474cf59",
+        "c42a0780-74ec-4e0f-a767-da18528eb26b",
+        "f40cea10-cae5-476f-af81-70928b5b70bb",
+        "f7557ece-ba08-43f8-acdd-2cfade500590",
+        "fda9cdc8-6dd2-4b83-bfc7-d2028555dd73"
+      ],
+      "metric_type": "ESTIMATED",
+      "scope": "Downloaded job accounting/structure; not visual label accuracy or physical-machine evidence."
+    }
+  ],
+  "observed_containers": [
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "a35f8884-0176-4768-b4ea-0eed39ca2b3d"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "3159d90d-4937-4e92-963b-d76a7a1ed9d8"
+    },
+    {
+      "worker": 3,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "7489ab2b-ed8a-4bfd-b9dd-fe00e0f7d729"
+    },
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "5eb66742-2d21-4c21-89d8-7aba398437fd"
+    },
+    {
+      "worker": 1,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "dbc74031-762d-431b-a1a4-6147f6d895e3"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "3d36eeb9-a02b-43e4-92f6-959be91029c1"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "0f3ba786-6a58-434f-91ac-3412a6553add"
+    },
+    {
+      "worker": 3,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "5be6575d-caf8-42ed-923e-4d1d366d0dce"
+    },
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "5bb3d765-74b6-4979-8f6c-31aba445f592"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "6961f88f-1535-4190-9de8-49f82502a257"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "9690da3c-6609-4374-b87e-27b0296a0bf3"
+    },
+    {
+      "worker": 3,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "b0ebd82c-f84c-4333-8993-b3215bfa05ce"
+    },
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "a969b68b-327d-4266-b69d-d7ffac8aac06"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "77352895-2241-49fe-9f58-dfa9b6c384dc"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "4f4b4873-1d5e-428f-a304-ba08edaab970"
+    },
+    {
+      "worker": 3,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "5db3002b-b2db-47df-b8f2-b8e51250295a"
+    },
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "f425b623-217e-41d3-a9e0-ba1c02f563ef"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "d7e36d6c-25e8-4c31-910b-e982e1f7fc74"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "0fc3b3ff-3e42-407a-937b-4e042cb645af"
+    },
+    {
+      "worker": 3,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "1f549fcb-814d-4036-8b3a-c2990b125b60"
+    },
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "ad473944-af9b-478c-9292-f9cd25844246"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "4dbe6d6d-e4e3-4e23-9e96-dbcbca114451"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "ddb3c5aa-69e4-4581-8d71-25e401d4a524"
+    },
+    {
+      "worker": 3,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "405034b8-f61b-48c1-95ca-fc8bf5407520"
+    },
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "86fe0e35-d9c3-4bde-842d-54d5d952ff82"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "f71fefd3-fbd8-4e2b-b7a1-f4e3c650bcf1"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "b651e61e-6baa-41ce-bc85-c8e5de2bef73"
+    },
+    {
+      "worker": 3,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "31dc6354-ab4e-404f-bd70-769bef12921d"
+    },
+    {
+      "worker": 5,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "9a274083-be52-42c8-bc58-2eb10b16d418"
+    },
+    {
+      "worker": 2,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "2dc96ef4-b4a1-4203-8a95-541c42d95dcc"
+    },
+    {
+      "worker": 4,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "ded761d6-a0c1-4f02-9e6b-ae3ebd9811a8"
+    }
+  ],
+  "owned_containers_after_stop": 0,
+  "unrelated_containers_preserved": true,
+  "accepted_counts": {
+    "nodes": 5,
+    "pairings": 5,
+    "tasks": 30,
+    "metrics": 30,
+    "ownership": [
+      {
+        "id": "2de124bb-ac2d-40d2-99ff-19a5edd79ef2",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "aa903f9b-db15-498a-8a75-71de3ac63083",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "356759a8-d64a-4751-9fb0-c5ff76f48db5",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "975aeaf8-bdcb-4d71-bc29-1fa9e592d17a",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "73131058-0fdc-4ed6-be62-2d7837824c8a",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "8de2488d-095b-4d00-bb82-898b9a241b0b",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "92b21f7e-e4d8-40d8-a058-f02d5e0a7349",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "975aeaf8-bdcb-4d71-bc29-1fa9e592d17a",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "027ea623-5803-4912-8ee6-7ab640bd5a1e",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "975aeaf8-bdcb-4d71-bc29-1fa9e592d17a",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "52405f88-1e50-4870-8219-dd1588aa1642",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "8de2488d-095b-4d00-bb82-898b9a241b0b",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "83812144-7963-4007-bf7e-3404f0487acf",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "aa903f9b-db15-498a-8a75-71de3ac63083",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "bb113349-6996-4c94-885c-53f0241ce919",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "8de2488d-095b-4d00-bb82-898b9a241b0b",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "106e6baa-faa3-4c60-a509-d12cefb7bfd0",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "8de2488d-095b-4d00-bb82-898b9a241b0b",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "248f421d-4bbf-4dce-aab2-3cb0efe8c17c",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "975aeaf8-bdcb-4d71-bc29-1fa9e592d17a",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "5ea34211-6525-463c-b7f7-1709b6d37ec4",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "975aeaf8-bdcb-4d71-bc29-1fa9e592d17a",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "646c513f-b694-4427-bfc0-2267ec0f9e4f",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "f6ccc44d-2bb2-4f50-97f1-1fd326de1350",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "100420a2-4efa-4e0f-9bc4-2e6f6655de02",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "aa903f9b-db15-498a-8a75-71de3ac63083",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "2697fd04-7149-4fed-ade3-ff9db4847e9e",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "f6ccc44d-2bb2-4f50-97f1-1fd326de1350",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "2f40218d-2e97-4259-a33d-3911e18348cb",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "8de2488d-095b-4d00-bb82-898b9a241b0b",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "3d831c6a-82b6-4a09-98b5-fde313953f12",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "f6ccc44d-2bb2-4f50-97f1-1fd326de1350",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "4ca78a0b-3316-4f67-8dc3-948e425bdc4d",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "aa903f9b-db15-498a-8a75-71de3ac63083",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "6facae91-d3c1-4160-883b-3e43f09a40f6",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "aa903f9b-db15-498a-8a75-71de3ac63083",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "7a0f246a-dfc3-4bbe-8692-b98164713bb8",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "975aeaf8-bdcb-4d71-bc29-1fa9e592d17a",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "9acafd94-fcee-4d87-b13e-7e71437dd776",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "aa903f9b-db15-498a-8a75-71de3ac63083",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "264b65f2-7842-4830-997c-10f980510048",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "f6ccc44d-2bb2-4f50-97f1-1fd326de1350",
+        "status": "COMPLETED",
+        "retryCount": 1
+      },
+      {
+        "id": "c220d946-73ce-49c3-8462-33be4474cf59",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "aa903f9b-db15-498a-8a75-71de3ac63083",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "c42a0780-74ec-4e0f-a767-da18528eb26b",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "8de2488d-095b-4d00-bb82-898b9a241b0b",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "f40cea10-cae5-476f-af81-70928b5b70bb",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "975aeaf8-bdcb-4d71-bc29-1fa9e592d17a",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "82d074e5-144e-4ec9-8422-33db3fb61122",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "f6ccc44d-2bb2-4f50-97f1-1fd326de1350",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "865b2211-585e-4baa-8109-522f2133d151",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "8de2488d-095b-4d00-bb82-898b9a241b0b",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "94d0dfdf-8a01-420e-8e18-7af4602faf65",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "f6ccc44d-2bb2-4f50-97f1-1fd326de1350",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "c1c6c491-d9b3-4829-8140-976b948f4917",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "975aeaf8-bdcb-4d71-bc29-1fa9e592d17a",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "fda9cdc8-6dd2-4b83-bfc7-d2028555dd73",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "aa903f9b-db15-498a-8a75-71de3ac63083",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "f7557ece-ba08-43f8-acdd-2cfade500590",
+        "jobId": "c78c6fef-f108-4aa8-867a-70dcd0468f7f",
+        "nodeId": "f6ccc44d-2bb2-4f50-97f1-1fd326de1350",
+        "status": "COMPLETED",
+        "retryCount": 0
+      }
+    ]
+  },
+  "fixture_exit_code": 0,
+  "accepted_tasks_per_worker": {
+    "1": 0,
+    "2": 7,
+    "3": 7,
+    "4": 8,
+    "5": 8
+  }
+}

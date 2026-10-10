@@ -6,11 +6,20 @@ import { config } from './config';
 import { check, equalSecret, fileName, fingerprint, HttpError, number, parseJob, TaskPayload, text, validateResult } from './validation';
 import { objectExists, objectPath, putObject, readResult, resultKey, signedUrl, verifySignedUrl } from './storage';
 import { nodeSession, pairingRouter, parseHardware, resourceLimits } from './pairing';
+import { jobSummary, pagination, publicJob, publicTask, safeError, taskItems } from './job_reads';
 
 export const prisma = new PrismaClient();
 export const app = express();
 app.disable('x-powered-by');
-app.use(cors({ origin: config.corsOrigins, exposedHeaders: ['Content-Disposition'] }));
+app.use(cors({ origin: config.corsOrigins, exposedHeaders: ['Content-Disposition', 'X-Request-ID'] }));
+app.use((req, res, next) => {
+  res.locals.requestId = randomUUID(); res.setHeader('X-Request-ID', res.locals.requestId);
+  res.once('finish', () => {
+    if (res.statusCode >= 500) console.error(JSON.stringify({ event: 'request_failed', request_id: res.locals.requestId,
+      method: req.method, route: req.route?.path || 'unmatched', status: res.statusCode }));
+  });
+  next();
+});
 app.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next(); });
 
 function bearer(req: Request) { return (req.headers.authorization || '').replace(/^Bearer /, ''); }
@@ -61,6 +70,11 @@ app.use('/api', pairingRouter(prisma, admin));
 app.get('/api/health', async (_req, res) => {
   await prisma.$queryRaw`SELECT 1`;
   res.json({ status: 'ok', storage: config.storageDriver });
+});
+app.get('/api/live', (_req, res) => res.json({ status: 'alive' }));
+app.get('/api/ready', async (_req, res) => {
+  try { await prisma.$queryRaw`SELECT 1`; res.json({ status: 'ready', storage: config.storageDriver }); }
+  catch { res.status(503).json({ status: 'not_ready', error: 'Database unavailable', request_id: res.locals.requestId }); }
 });
 app.post('/api/nodes/register', async (req, res) => {
   check(config.allowLegacyEnrollment, 'Script enrollment disabled; use pairing approval', 403);
@@ -138,19 +152,23 @@ async function reconcileJob(tx: Tx, jobId: string) {
   // Metric inserts take foreign-key KEY SHARE locks. NO KEY UPDATE serializes
   // counters without upgrading those locks into a concurrent-completion deadlock.
   await tx.$queryRaw`SELECT id FROM "Job" WHERE id = ${jobId} FOR NO KEY UPDATE`;
+  const job = await tx.job.findUniqueOrThrow({ where: { id: jobId } });
   const tasks = await tx.task.findMany({ where: { jobId }, select: { status: true, result: true } });
   const completed = tasks.filter(t => t.status === 'COMPLETED');
   const failed = tasks.filter(t => t.status === 'FAILED').length;
-  const terminal = completed.length + failed === tasks.length;
+  const cancelled = tasks.filter(t => t.status === 'CANCELLED').length;
+  const terminal = completed.length + failed + cancelled === tasks.length;
   const partial = failed > 0 || completed.some(t => ((t.result as any)?.itemsFailed || 0) > 0);
-  const status = terminal ? (completed.length === 0 ? 'FAILED' : partial ? 'PARTIAL_SUCCESS' : 'COMPLETED') : 'IN_PROGRESS';
-  await tx.job.update({ where: { id: jobId }, data: { completedTasks: completed.length, failedTasks: failed, status, completedAt: terminal ? new Date() : null } });
+  const status = job.status === 'CANCELLED' ? 'CANCELLED' : terminal ? (completed.length === 0 ? 'FAILED' : partial ? 'PARTIAL_SUCCESS' : 'COMPLETED') : 'IN_PROGRESS';
+  await tx.job.update({ where: { id: jobId }, data: { completedTasks: completed.length, failedTasks: failed, cancelledTasks: cancelled, status, completedAt: terminal ? job.completedAt || new Date() : null } });
   return status;
 }
 async function failAttempt(tx: Tx, task: Task, error: string, retryable: boolean) {
   const retry = retryable && task.retryCount < config.maxRetries;
+  await tx.taskAttempt.updateMany({ where: { taskId: task.id, number: task.retryCount, status: 'ASSIGNED' },
+    data: { status: retry ? 'REQUEUED' : 'FAILED', finishedAt: new Date(), error: safeError(error) } });
   await tx.task.update({ where: { id: task.id }, data: {
-    status: retry ? 'QUEUED' : 'FAILED', leaseExpiresAt: null, lastError: error,
+    status: retry ? 'QUEUED' : 'FAILED', leaseExpiresAt: null, lastError: safeError(error), completedAt: retry ? null : new Date(),
     retryCount: retry ? { increment: 1 } : task.retryCount,
   } });
   await reconcileJob(tx, task.jobId);
@@ -181,7 +199,8 @@ app.post('/api/nodes/:node_id/heartbeat', worker, async (req, res) => {
     await tx.task.update({ where: { id: taskId }, data: { leaseExpiresAt } });
     return 'NONE';
   });
-  res.json({ acknowledged: true, action, lease_expires_at: leaseExpiresAt });
+  res.json({ acknowledged: true, action, lease_expires_at: leaseExpiresAt,
+    lease_remaining_ms: leaseExpiresAt ? Math.max(0, leaseExpiresAt.getTime() - Date.now()) : undefined });
 });
 
 app.post('/api/jobs', admin, async (req, res) => {
@@ -231,7 +250,10 @@ app.get('/api/tasks/request', worker, async (_req, res) => {
       nodeId, status: 'ASSIGNED', leaseToken: randomUUID(), assignedAt: new Date(),
       leaseExpiresAt: new Date(Date.now() + Math.min(config.leaseMs, config.maxAttemptMs)),
     } });
+    await tx.taskAttempt.create({ data: { taskId: task.id, number: task.retryCount, nodeId,
+      workerName: node.name, assignedAt: task.assignedAt! } });
     await tx.node.update({ where: { id: nodeId }, data: { status: 'WORKING' } });
+    await tx.job.updateMany({ where: { id: task.jobId, startedAt: null }, data: { startedAt: task.assignedAt } });
     await tx.job.updateMany({ where: { id: task.jobId, status: 'QUEUED' }, data: { status: 'IN_PROGRESS' } });
     return task;
   });
@@ -239,6 +261,7 @@ app.get('/api/tasks/request', worker, async (_req, res) => {
   const payload = task.payload as unknown as TaskPayload;
   const items = await Promise.all(payload.items.map(async item => ({ ...item, download_url: item.key ? await signedUrl('GET', item.key) : undefined })));
   res.json({ task_id: task.id, job_id: task.jobId, lease_token: task.leaseToken, lease_expires_at: task.leaseExpiresAt,
+    lease_remaining_ms: Math.max(0, task.leaseExpiresAt!.getTime() - Date.now()),
     attempt_deadline: new Date(task.assignedAt!.getTime() + config.maxAttemptMs), retry_count: task.retryCount,
     payload: { ...payload, items } });
 });
@@ -274,7 +297,9 @@ app.post('/api/tasks/:task_id/complete', worker, async (req, res) => {
     assertAttempt(task, res.locals.node.id, token, false);
     if (task.status === 'COMPLETED') return 'TASK_COMPLETED';
     assertAttempt(task, res.locals.node.id, token);
-    await tx.task.update({ where: { id: taskId }, data: { status: 'COMPLETED', result: { ...result, result_key: key }, leaseExpiresAt: null, lastError: null } });
+    await tx.task.update({ where: { id: taskId }, data: { status: 'COMPLETED', result: { ...result, result_key: key }, leaseExpiresAt: null, lastError: null, completedAt: new Date() } });
+    await tx.taskAttempt.updateMany({ where: { taskId, number: task.retryCount, status: 'ASSIGNED' },
+      data: { status: 'COMPLETED', finishedAt: new Date(), executionTimeMs } });
     await tx.metric.create({ data: { taskId, nodeId: task.nodeId!, jobId: task.jobId, executionTimeMs, energyWh } });
     const jobStatus = await reconcileJob(tx, task.jobId);
     return ['COMPLETED', 'PARTIAL_SUCCESS'].includes(jobStatus) ? `JOB_${jobStatus}` : 'TASK_COMPLETED';
@@ -287,6 +312,8 @@ app.post('/api/tasks/:task_id/fail', worker, async (req, res) => {
   const error = text(req.body?.error, 'error', 2000);
   check(typeof req.body.retryable === 'boolean', 'retryable must be boolean');
   const status = await prisma.$transaction(async tx => {
+    await tx.$queryRaw`SELECT id FROM "Node" WHERE id = ${res.locals.node.id} FOR NO KEY UPDATE`;
+    check(!(await tx.node.findUniqueOrThrow({ where: { id: res.locals.node.id } })).revokedAt, 'Worker access revoked', 403);
     await lockTask(tx, taskId);
     const task = await tx.task.findUniqueOrThrow({ where: { id: taskId } });
     assertAttempt(task, res.locals.node.id, req.body.lease_token, false);
@@ -295,6 +322,58 @@ app.post('/api/tasks/:task_id/fail', worker, async (req, res) => {
     return failAttempt(tx, task, error, req.body.retryable);
   });
   res.json({ status });
+});
+
+app.post('/api/jobs/:job_id/cancel', admin, async (req, res) => {
+  const jobId = String(req.params.job_id);
+  const job = await prisma.$transaction(async tx => {
+    // Match completion's Task -> Job lock order, including racing assignments.
+    await tx.$queryRaw`SELECT id FROM "Task" WHERE "jobId" = ${jobId} ORDER BY id FOR UPDATE`;
+    await tx.$queryRaw`SELECT id FROM "Job" WHERE id = ${jobId} FOR NO KEY UPDATE`;
+    const current = await tx.job.findUnique({ where: { id: jobId } });
+    check(current, 'Job not found', 404);
+    if (['COMPLETED', 'PARTIAL_SUCCESS', 'FAILED', 'CANCELLED'].includes(current.status)) return current;
+    const unfinished = await tx.task.findMany({ where: { jobId, status: { in: ['QUEUED', 'ASSIGNED'] } }, select: { id: true } });
+    await tx.taskAttempt.updateMany({ where: { taskId: { in: unfinished.map(t => t.id) }, status: 'ASSIGNED' },
+      data: { status: 'CANCELLED', finishedAt: new Date(), error: 'Cancelled by grid administrator' } });
+    await tx.task.updateMany({ where: { jobId, status: { in: ['QUEUED', 'ASSIGNED'] } },
+      data: { status: 'CANCELLED', leaseExpiresAt: null, completedAt: new Date(), lastError: 'Cancelled by grid administrator' } });
+    return tx.job.update({ where: { id: jobId }, data: { status: 'CANCELLED', cancelledTasks: unfinished.length, completedAt: new Date() } });
+  }, { timeout: 20_000 });
+  res.json(publicJob(job));
+});
+app.get('/api/jobs', admin, async (req, res) => {
+  const { page, limit, skip } = pagination(req.query);
+  const [jobs, total] = await prisma.$transaction([
+    prisma.job.findMany({ orderBy: [{ createdAt: 'desc' }, { id: 'asc' }], skip, take: limit }), prisma.job.count(),
+  ], { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
+  res.json({ jobs: jobs.map(publicJob), total, page, limit });
+});
+app.get('/api/jobs/:job_id', admin, async (req, res) => {
+  res.json(await prisma.$transaction(tx => jobSummary(tx, String(req.params.job_id)),
+    { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 20_000 }));
+});
+app.get('/api/jobs/:job_id/tasks', admin, async (req, res) => {
+  const { page, limit, skip } = pagination(req.query);
+  const jobId = String(req.params.job_id);
+  check(await prisma.job.findUnique({ where: { id: jobId }, select: { id: true } }), 'Job not found', 404);
+  const [tasks, total] = await prisma.$transaction([
+    prisma.task.findMany({ where: { jobId }, orderBy: [{ createdAt: 'asc' }, { id: 'asc' }], skip, take: limit,
+      include: { attempts: { orderBy: { number: 'desc' }, take: 10 }, metric: true } }), prisma.task.count({ where: { jobId } }),
+  ], { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
+  res.json({ tasks: tasks.map(publicTask), total, page, limit });
+});
+app.get('/api/tasks/:task_id', admin, async (req, res) => {
+  const { page, limit, skip } = pagination(req.query);
+  const taskId = String(req.params.task_id);
+  const result = await prisma.$transaction(async tx => {
+    const task = await tx.task.findUnique({ where: { id: taskId }, include: { metric: true } });
+    check(task, 'Task not found', 404);
+    const attempts = await tx.taskAttempt.findMany({ where: { taskId }, orderBy: { number: 'asc' }, skip, take: limit });
+    return { task: publicTask({ ...task, attempts }), items: taskItems(task),
+      total_attempts: await tx.taskAttempt.count({ where: { taskId } }), page, limit };
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
+  res.json(result);
 });
 
 app.get('/api/dashboard/sync', admin, async (_req, res) => {
@@ -309,7 +388,7 @@ app.get('/api/dashboard/sync', admin, async (_req, res) => {
   const displayNodes = nodes.map(n => ({ ...n, status: n.revokedAt ? 'REVOKED' : n.lastHeartbeat.getTime() <= Date.now() - config.offlineMs ? 'OFFLINE' : n.status }));
   const contributing = active.filter(n => !n.paused);
   res.json({ hardware: { total_nodes: nodes.length, active_nodes: active.length, available_cores: contributing.reduce((s, n) => s + (resourceLimits(n)?.cpu ?? n.cpuCores), 0), available_ram_gb: contributing.reduce((s, n) => s + (resourceLimits(n)?.memory_gb ?? n.ramGb), 0) },
-    workloads: { total_tasks_completed: completed, recent_jobs: jobs.map(({ requestKey, requestHash, ...job }) => job), task_counts: Object.fromEntries(tasks.map(t => [t.status, t._count._all])) },
+    workloads: { total_tasks_completed: completed, recent_jobs: jobs.map(publicJob), total_jobs: await prisma.job.count(), task_counts: Object.fromEntries(tasks.map(t => [t.status, t._count._all])) },
     environmental: { estimated_energy_wh: energy._sum.energyWh || 0, execution_time_ms: energy._sum.executionTimeMs || 0, metric_type: 'ESTIMATED' }, nodes: displayNodes });
 });
 
@@ -317,20 +396,24 @@ app.get('/api/jobs/:job_id/results', admin, async (req, res) => {
   const job = await prisma.job.findUnique({ where: { id: String(req.params.job_id) }, include: { tasks: { orderBy: { createdAt: 'asc' } }, metrics: true } });
   check(job, 'Job not found', 404);
   const predictions: unknown[] = []; const errors: unknown[] = [];
-  let itemsProcessed = 0; let itemsFailed = 0;
+  let itemsProcessed = 0; let itemsFailed = 0; let itemsCancelled = 0;
   for (const task of job.tasks) {
     const result = task.result as any;
     if (task.status === 'COMPLETED' && result) {
       itemsProcessed += result.itemsProcessed; itemsFailed += result.itemsFailed;
       predictions.push(...result.predictions.map((p: any) => ({ ...p, task_id: task.id })));
-      errors.push(...result.errors.map((e: any) => ({ ...e, task_id: task.id })));
+      errors.push(...result.errors.map((e: any) => ({ image: e.image, error: safeError(e.error), task_id: task.id })));
     } else if (task.status === 'FAILED') {
       itemsFailed += (task.payload as any).items.length;
-      errors.push({ task_id: task.id, error: task.lastError });
+      errors.push(...taskItems(task).map(item => ({ image: item.image, task_id: task.id, error: item.error, status: 'FAILED' })));
+    } else if (task.status === 'CANCELLED') {
+      itemsCancelled += (task.payload as any).items.length;
+      errors.push(...taskItems(task).map(item => ({ image: item.image, task_id: task.id, error: item.error, status: 'CANCELLED' })));
     }
   }
   res.setHeader('Content-Disposition', `attachment; filename="job-${job.id}.json"`);
   res.json({ job_id: job.id, name: job.name, status: job.status, total_tasks: job.totalTasks, completed_tasks: job.completedTasks, failed_tasks: job.failedTasks,
+    cancelled_tasks: job.cancelledTasks, items_cancelled: itemsCancelled,
     items_processed: itemsProcessed, items_failed: itemsFailed, predictions, errors,
     metrics: { estimated_energy_wh: job.metrics.reduce((s, m) => s + m.energyWh, 0), execution_time_ms: job.metrics.reduce((s, m) => s + m.executionTimeMs, 0), metric_type: 'ESTIMATED' } });
 });
@@ -348,8 +431,12 @@ export async function sweep() {
 }
 
 app.use((_req, _res, next) => next(new HttpError(404, 'Endpoint not found')));
-app.use((error: any, _req: Request, res: Response, _next: NextFunction) => {
-  const status = error instanceof HttpError ? error.status : error.type === 'entity.too.large' ? 413 : error instanceof SyntaxError ? 400 : 500;
-  if (status === 500) console.error(error);
-  res.status(status).json({ error: status === 500 ? 'Internal server error' : error.message });
+app.use((error: any, _req: Request, res: Response, next: NextFunction) => {
+  if (res.headersSent) { next(error); return; }
+  const unavailable = ['P1001', 'P1002', 'P2024', 'ENOSPC', 'EIO', 'ECONNREFUSED'].includes(error.code);
+  const status = error instanceof HttpError ? error.status : error.type === 'entity.too.large' ? 413 : error instanceof SyntaxError ? 400 : unavailable ? 503 : 500;
+  if (status >= 500) console.error(JSON.stringify({ event: 'operation_failed', request_id: res.locals.requestId,
+    code: /^[A-Z0-9_]{1,30}$/.test(error.code || '') ? error.code : 'UNEXPECTED' }));
+  res.status(status).json({ error: status >= 500 ? unavailable ? 'Dependency temporarily unavailable; retry safely' : 'Internal server error' : error.message,
+    request_id: res.locals.requestId });
 });

@@ -1,5 +1,11 @@
 # Step 5 - verified offline workload distribution
 
+Current update, 10 October 2026: the Windows 0.6.1 app bundles its host runtime;
+Python/Tk is required only for the source preview below. Its trusted manifest
+uses **team-offline-v2**. See [current release files and usage](WINDOWS_WORKER_RELEASE.md)
+for the matching archive checksum/image IDs. The v1 values below describe the
+historical initial release and must not be mixed with the new v2 app.
+
 Implemented source preview on 10 October 2026. This route imports a team-built
 Docker archive without building workloads on each contributing laptop. It does
 not install Python/Docker or create the Step 6 Windows installer.

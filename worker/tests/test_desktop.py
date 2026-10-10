@@ -257,5 +257,39 @@ class DesktopTests(unittest.TestCase):
         self.assertEqual(str(self.window.stop_button['state']), 'disabled')
         self.assertEqual(load_state(Path(self.temp.name)/'credentials.json')['node_id'], self.node_id)
 
+    def test_tray_actions_do_not_complete_inflight_preparation(self):
+        self.window.busy = True
+        self.window.events.put(('tray-action', 'open', None))
+        self.root.update()
+        self.window.drain_events()
+        self.assertTrue(self.window.busy)
+        self.window.busy = False
+
+    def test_tray_failure_keeps_window_usable_without_starting_compute(self):
+        with patch.object(self.window.tray, 'start', side_effect=RuntimeError('Tray unavailable')):
+            self.window.minimize_to_tray()
+        self.assertFalse(self.window.minimizing)
+        self.assertEqual(self.root.state(), 'normal')
+        self.spawn.assert_not_called()
+
+    def test_window_hides_only_after_tray_ready_and_open_restores_it(self):
+        with patch.object(self.window.tray, 'start'):
+            self.window.minimize_to_tray()
+            self.assertTrue(self.window.minimizing)
+            self.window.events.put(('tray-ready', None, None))
+            self.window.drain_events()
+            self.assertEqual(self.root.state(), 'withdrawn')
+            self.window.events.put(('tray-action', 'open', None))
+            self.window.drain_events()
+            self.assertEqual(self.root.state(), 'normal')
+
+    def test_failed_startup_registration_reflects_actual_state(self):
+        self.window.startup_enabled.set(True)
+        with patch('windows_startup.set_enabled', side_effect=OSError('Registry denied')), patch('windows_startup.is_enabled', return_value=False):
+            self.window.change_startup()
+        self.assertFalse(self.window.startup_enabled.get())
+        self.assertIn('Registry denied', self.window.status.get())
+        self.spawn.assert_not_called()
+
 
 if __name__ == '__main__': unittest.main()

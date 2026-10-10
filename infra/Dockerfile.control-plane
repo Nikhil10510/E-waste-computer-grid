@@ -6,6 +6,7 @@ RUN npm ci
 COPY control-plane/prisma ./prisma
 COPY control-plane/tsconfig.json ./
 COPY control-plane/src ./src
+COPY control-plane/scripts ./scripts
 RUN npm run build
 EXPOSE 8080
-CMD ["sh", "-c", "npx prisma db push && node dist/index.js"]
+CMD ["sh", "-c", "npm run db:deploy && exec node dist/index.js"]

@@ -1,0 +1,88 @@
+{
+  "job_id": "d74163e3-97b4-4531-aa72-9c4ae7eff2dc",
+  "name": "Packaged worker acceptance",
+  "status": "COMPLETED",
+  "total_tasks": 2,
+  "completed_tasks": 2,
+  "failed_tasks": 0,
+  "items_processed": 10,
+  "items_failed": 0,
+  "predictions": [
+    {
+      "image": "00005_coffee.png",
+      "classId": 967,
+      "className": "espresso",
+      "confidence": 0.9907,
+      "task_id": "50a8bb28-477a-4021-9e7a-ee1980cc857d"
+    },
+    {
+      "image": "00006_coins.png",
+      "classId": 943,
+      "className": "cucumber",
+      "confidence": 0.6825,
+      "task_id": "50a8bb28-477a-4021-9e7a-ee1980cc857d"
+    },
+    {
+      "image": "00007_grass.png",
+      "classId": 363,
+      "className": "armadillo",
+      "confidence": 0.073,
+      "task_id": "50a8bb28-477a-4021-9e7a-ee1980cc857d"
+    },
+    {
+      "image": "00008_gravel.png",
+      "classId": 533,
+      "className": "dishrag",
+      "confidence": 0.4859,
+      "task_id": "50a8bb28-477a-4021-9e7a-ee1980cc857d"
+    },
+    {
+      "image": "00009_rocket.jpg",
+      "classId": 682,
+      "className": "obelisk",
+      "confidence": 0.4951,
+      "task_id": "50a8bb28-477a-4021-9e7a-ee1980cc857d"
+    },
+    {
+      "image": "00000_astronaut.png",
+      "classId": 450,
+      "className": "bobsled",
+      "confidence": 0.3044,
+      "task_id": "70a4408f-ab69-4d9b-949f-4aa0f6c2233d"
+    },
+    {
+      "image": "00001_brick.png",
+      "classId": 807,
+      "className": "solar dish",
+      "confidence": 0.2362,
+      "task_id": "70a4408f-ab69-4d9b-949f-4aa0f6c2233d"
+    },
+    {
+      "image": "00002_camera.png",
+      "classId": 872,
+      "className": "tripod",
+      "confidence": 0.9972,
+      "task_id": "70a4408f-ab69-4d9b-949f-4aa0f6c2233d"
+    },
+    {
+      "image": "00003_chelsea.png",
+      "classId": 285,
+      "className": "Egyptian cat",
+      "confidence": 0.7451,
+      "task_id": "70a4408f-ab69-4d9b-949f-4aa0f6c2233d"
+    },
+    {
+      "image": "00004_clock_motion.png",
+      "classId": 818,
+      "className": "spotlight",
+      "confidence": 0.8267,
+      "task_id": "70a4408f-ab69-4d9b-949f-4aa0f6c2233d"
+    }
+  ],
+  "errors": [],
+  "metrics": {
+    "estimated_energy_wh": 0.2470722222222222,
+    "execution_time_ms": 6842,
+    "metric_type": "ESTIMATED"
+  }
+}

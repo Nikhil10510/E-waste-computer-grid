@@ -8,6 +8,7 @@
     "build": "prisma generate && tsc",
     "start": "node dist/index.js",
     "db:push": "prisma db push",
+    "db:deploy": "node scripts/deploy_database.cjs",
     "test": "npm run build && node --test tests/*.test.cjs"
   },
   "keywords": [],

@@ -7,7 +7,17 @@ below: approved offline archive, trusted image-ID/checksum manifest, background
 preparation/cancellation, pinned real preflight and exact local Docker job output.
 The user reports preflight passed on a separate Windows laptop; its final approved
 job evidence is pending. Read docs/OFFLINE_RUNTIME.md and the Step 5 ledger first.
-Steps 6-7 remain open. Earlier PDFs and checkpoint counts remain historical.
+Step 6 implementation now includes the Windows 0.6.2 installer, frozen GUI/helper,
+tray, optional login startup and owned upgrade/uninstall with local evidence.
+See docs/WINDOWS_WORKER_RELEASE.md and output/onboarding/step6-acceptance.md.
+Step 5's physical job gate and Step 7 clean-PC/login/LAN acceptance remain open.
+Earlier PDFs and checkpoint counts remain historical.
+
+The latest software checkpoint also includes paginated job/batch/attempt history,
+worker attribution, per-image predictions/errors, timing and estimate boundaries,
+job cancellation, safe additive migration deployment and an independent lease
+watchdog. Read [software completion and remaining work](SOFTWARE_COMPLETION.md)
+first. Its current evidence supersedes older pending-software statements below.
 
 ## Project context and goals
 

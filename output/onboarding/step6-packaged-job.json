@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-10T05:47:36.127668+00:00",
+  "status": "PASSED",
+  "scope": "1 REAL frozen helpers on ONE Windows PC; isolated DB/API/Docker; approvals simulated; no physical laptop or speedup claim",
+  "helper_sha256": "b6468fa369db417c155d6d203952087efbe5656bd3c024122b7d3941e407b335",
+  "checks": {
+    "no_agent_or_identity_before_fixture_approval": true,
+    "real_frozen_preflight_and_saved_limits": true,
+    "paused_helpers_accept_no_work": true,
+    "immutable_images_and_real_container_quotas": true,
+    "pause_survives_packaged_helper_restart": true,
+    "unavailable_docker_fails_preflight": true,
+    "frozen_helper_requires_approval_despite_environment_override": true,
+    "packaged_native_execution_refused": true,
+    "unrelated_running_container_survives_worker_cleanup": true
+  },
+  "jobs": [
+    {
+      "job_id": "d74163e3-97b4-4531-aa72-9c4ae7eff2dc",
+      "status": "COMPLETED",
+      "tasks": 2,
+      "images": 10,
+      "exact_input_coverage": true,
+      "errors": 0,
+      "task_ids": [
+        "50a8bb28-477a-4021-9e7a-ee1980cc857d",
+        "70a4408f-ab69-4d9b-949f-4aa0f6c2233d"
+      ],
+      "metric_type": "ESTIMATED",
+      "scope": "Downloaded job accounting/structure; not visual label accuracy or physical-machine evidence."
+    }
+  ],
+  "observed_containers": [
+    {
+      "worker": 1,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "deea756f-d776-4f22-8d39-89990d9f6b56"
+    },
+    {
+      "worker": 1,
+      "image": "sha256:5022dd5696da2009c0308de04ae383f1b3543fee05b295432e4d44697c73ee08",
+      "cpu": 0.5,
+      "memory_bytes": 1073741824,
+      "attempt": "9746d9d8-5f9f-4a76-8280-6d06ba315410"
+    }
+  ],
+  "owned_containers_after_stop": 0,
+  "unrelated_containers_preserved": true,
+  "accepted_counts": {
+    "nodes": 1,
+    "pairings": 1,
+    "tasks": 2,
+    "metrics": 2,
+    "ownership": [
+      {
+        "id": "50a8bb28-477a-4021-9e7a-ee1980cc857d",
+        "jobId": "d74163e3-97b4-4531-aa72-9c4ae7eff2dc",
+        "nodeId": "a055ca56-e71c-41e3-a15a-affccbfee8eb",
+        "status": "COMPLETED",
+        "retryCount": 0
+      },
+      {
+        "id": "70a4408f-ab69-4d9b-949f-4aa0f6c2233d",
+        "jobId": "d74163e3-97b4-4531-aa72-9c4ae7eff2dc",
+        "nodeId": "a055ca56-e71c-41e3-a15a-affccbfee8eb",
+        "status": "COMPLETED",
+        "retryCount": 0
+      }
+    ]
+  },
+  "fixture_exit_code": 0,
+  "accepted_tasks_per_worker": {
+    "1": 2
+  }
+}

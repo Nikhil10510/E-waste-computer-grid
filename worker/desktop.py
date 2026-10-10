@@ -15,6 +15,11 @@ from pairing_client import PairingClient, normalize_api_url, state_directory
 from resource_limits import validate_limits
 from state_store import load_state, save_state, WINDOWS
 from log_safety import safe_text
+from product import VERSION, PRODUCT_NAME
+from launch import prepare_external_programs
+from tray_control import TrayControl
+import windows_startup
+from app_lifecycle import control_directory, instance_lock, AppAlreadyRunning, request, shutdown_app
 
 
 @contextmanager
@@ -39,7 +44,10 @@ def desktop_lock(directory):
 
 
 class WorkerWindow:
-    def __init__(self, root, api_url='', allow_http=False, directory=None):
+    def __init__(self, root, api_url='', allow_http=False, directory=None, control=None):
+        self.control = Path(control) if control else None
+        self.tray = TrayControl(queue.Queue())
+        self.minimizing = False
         self.preferences = Path(os.environ.get('LOCALAPPDATA', str(Path.home() / '.local/share'))) / 'EWasteGrid' / 'desktop-settings.json'
         preference_error = None
         if not api_url and directory is None and self.preferences.exists():
@@ -50,6 +58,7 @@ class WorkerWindow:
         api_url = api_url or 'http://localhost:8080/api'
         self.root, self.directory_override = root, directory
         self.events = queue.Queue()
+        self.tray.events = self.events
         self.client = self.runtime = None
         self.lock_context = None
         self.busy, self.closing, self.approved, self.stopping = False, False, False, False
@@ -64,7 +73,7 @@ class WorkerWindow:
         self.threads = []
         self.preparation_cancel = threading.Event()
         self.preparing_runtime = False
-        root.title('E-Waste Grid Worker')
+        root.title(f'{PRODUCT_NAME} {VERSION}')
         root.geometry('740x650'); root.minsize(520, 440)
         root.protocol('WM_DELETE_WINDOW', self.close)
         style = ttk.Style(root)
@@ -77,6 +86,15 @@ class WorkerWindow:
         ttk.Label(header, text='Contribute this laptop', style='Title.TLabel').pack(anchor='w')
         self.connection = tk.StringVar(value='Not connected')
         ttk.Label(header, textvariable=self.connection).pack(anchor='w')
+        app_row = ttk.Frame(header); app_row.pack(fill='x', pady=(4, 0))
+        self.tray_button = ttk.Button(app_row, text='Minimize to tray', command=self.minimize_to_tray)
+        self.tray_button.pack(side='left')
+        self.startup_enabled = tk.BooleanVar(value=False)
+        self.startup_box = ttk.Checkbutton(app_row, text='Open app when I sign in', variable=self.startup_enabled,
+            command=self.change_startup, state='normal' if windows_startup.supported() else 'disabled')
+        self.startup_box.pack(side='left', padx=8)
+        try: self.startup_enabled.set(windows_startup.is_enabled())
+        except Exception as error: preference_error = safe_text(error)
         footer = ttk.Frame(root, padding=(18, 8)); footer.pack(side='bottom', fill='x')
         self.status = tk.StringVar(value='Choose your grid and limits, then prepare a connection.')
         self.status_label = ttk.Label(footer, textvariable=self.status, wraplength=680)
@@ -141,12 +159,55 @@ class WorkerWindow:
         self.retry_button = ttk.Button(connection_row, text='Check invitation again', command=self.poll, state='disabled'); self.retry_button.pack(side='left')
         self.policy = tk.StringVar(value='Choose limits before pairing. Docker enforces the workload ceilings.')
         ttk.Label(panel, textvariable=self.policy, wraplength=660).pack(anchor='w', pady=(12, 0))
-        ttk.Label(panel, text='Approved workloads: image classification and pipeline demo.\nWorkload limits exclude Docker/WSL overhead. Source/Python still required.', wraplength=460).pack(anchor='w', pady=(6, 0))
+        ttk.Label(panel, text='Approved workloads: image classification and pipeline demo.\nWorkload limits exclude Docker/WSL overhead. Docker with Linux containers is required.\nClosing this window stops work; minimize explicitly to keep participating.', wraplength=460).pack(anchor='w', pady=(6, 0))
         ttk.Label(panel, text='Saved state: Windows account protection (DPAPI).' if WINDOWS else 'Saved state: owner-only files; Windows encryption is unavailable.', wraplength=460).pack(anchor='w', pady=(6, 0))
         root.bind('<Configure>', lambda event: self.status_label.configure(wraplength=max(350, root.winfo_width() - 40)) if event.widget is root else None)
         self.restore_settings(api_url, allow_http)
         if preference_error: self.status.set(preference_error)
         root.after(100, self.drain_events)
+
+    def change_startup(self):
+        try:
+            windows_startup.set_enabled(self.startup_enabled.get())
+            self.status.set('Login startup updated. Opening the app does not start computation; use Start worker explicitly.')
+        except Exception as error:
+            self.status.set(safe_text(error))
+        finally:
+            try: self.startup_enabled.set(windows_startup.is_enabled())
+            except Exception: self.startup_enabled.set(False)
+
+    def minimize_to_tray(self):
+        if self.closing or self.minimizing: return
+        if self.popup is not None:
+            self.status.set('Respond to the owner invitation before minimizing.'); return
+        try:
+            self.minimizing = True
+            self.tray.start()
+            self.status.set('Opening the tray. Work may continue while the window is hidden. Use Exit to stop.')
+        except Exception as error:
+            self.minimizing = False
+            self.status.set(safe_text(error)); self.open_window()
+
+    def open_window(self):
+        self.root.deiconify(); self.root.lift()
+        self.root.focus_force()
+
+    def tray_action(self, action):
+        if action == 'open': self.open_window()
+        elif action == 'exit': self.close()
+        elif action == 'start': self.start()
+        elif action == 'stop': self.stop()
+        elif action == 'pause': self.toggle_pause()
+
+    def refresh_tray(self):
+        running = bool(self.runtime and self.runtime.running())
+        snapshot = {'start': self.approved and not self.busy and not running and not self.stopping,
+            'stop': (running or self.starting) and not self.stopping,
+            'pause': self.approved and not self.busy, 'paused': self.paused,
+            'status': self.connection.get()[:100]}
+        try: self.tray.update(snapshot)
+        except Exception as error:
+            self.status.set('Tray needs attention: ' + safe_text(error)); self.open_window()
 
     def restore_settings(self, api_url, allow_http):
         try:
@@ -296,6 +357,7 @@ class WorkerWindow:
 
     def show_invitation(self, data):
         if self.popup is not None: return
+        self.open_window()
         self.popup = tk.Toplevel(self.root)
         self.popup.title('Approve grid invitation')
         self.popup.geometry('560x400'); self.popup.minsize(560, 360)
@@ -361,9 +423,17 @@ class WorkerWindow:
 
     def finish_close(self):
         if self.lock_context: self.lock_context.__exit__(None, None, None); self.lock_context = None
+        self.tray.stop()
         self.root.destroy()
 
     def drain_events(self):
+        if self.control and not self.closing:
+            for action in ('show', 'shutdown'):
+                path = self.control / (action + '.request')
+                if path.exists():
+                    path.unlink(missing_ok=True)
+                    if action == 'show': self.open_window()
+                    else: self.close()
         self.threads = [thread for thread in self.threads if thread.is_alive()]
         if self.closing:
             try:
@@ -377,6 +447,16 @@ class WorkerWindow:
         try:
             while True:
                 name, result, error = self.events.get_nowait()
+                if name.startswith('tray-'):
+                    if name == 'tray-ready':
+                        self.minimizing = False
+                        if not self.popup: self.root.withdraw()
+                    elif name == 'tray-failed':
+                        self.minimizing = False
+                        self.status.set('Could not open the tray: ' + safe_text(error)); self.open_window()
+                    elif name == 'tray-action': self.tray_action(result)
+                    if self.closing: return
+                    continue
                 if name == 'runtime-progress':
                     if not self.preparation_cancel.is_set(): self.status.set(result)
                     continue
@@ -480,18 +560,43 @@ class WorkerWindow:
             self.stopping = False
             self.connection.set('Approved — worker stopped' if self.approved else 'Connection needs attention')
             if self.disconnecting: self.reset_connection()
+        self.refresh_tray()
         self.root.after(150, self.drain_events)
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Owner approval window for the source-based grid worker')
+    prepare_external_programs()
+    parser = argparse.ArgumentParser(description='Owner approval app for the grid worker')
     parser.add_argument('--api-url', default=None, help='Grid address; otherwise restore the last selected grid')
     parser.add_argument('--allow-http', action='store_true', help='Allow trusted local demo HTTP')
     parser.add_argument('--state-directory', type=Path)
+    parser.add_argument('--control-directory', type=Path, help='Isolated app control directory for development acceptance')
+    parser.add_argument('--shutdown', action='store_true', help='Request same-user app shutdown and wait; no process killing')
+    parser.add_argument('--remove-startup', action='store_true', help='Remove this install\'s optional login entry')
+    parser.add_argument('--login-startup', action='store_true', help='Open at login; never starts computation')
+    parser.add_argument('--smoke-test', action='store_true', help='Explicit isolated Tk/tray diagnostic; no enrollment or computation')
+    parser.add_argument('--report', type=Path, help='JSON output for --smoke-test')
     args = parser.parse_args()
-    root = tk.Tk()
-    WorkerWindow(root, args.api_url, args.allow_http, args.state_directory)
-    root.mainloop()
+    control = args.control_directory or control_directory()
+    if args.shutdown: return 0 if shutdown_app(control) else 2
+    if args.remove_startup:
+        try: windows_startup.set_enabled(False); return 0
+        except Exception: return 2
+    try:
+        with instance_lock(control, record_owner=True):
+            for action in ('show', 'shutdown'): (control / (action + '.request')).unlink(missing_ok=True)
+            if args.smoke_test:
+                if not args.report: parser.error('--smoke-test requires --report')
+                from package_checks import gui_smoke
+                return gui_smoke(control, args.report)
+            root = tk.Tk()
+            WorkerWindow(root, args.api_url, args.allow_http, args.state_directory, control)
+            root.mainloop()
+    except AppAlreadyRunning:
+        request(control, 'show')
+    return 0
 
 
-if __name__ == '__main__': main()
+if __name__ == '__main__':
+    import sys
+    sys.exit(main())

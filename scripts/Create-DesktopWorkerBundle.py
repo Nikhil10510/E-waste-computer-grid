@@ -1,5 +1,6 @@
 """Build a source desktop handoff; this is not an installer or Python runtime."""
 import hashlib
+import argparse
 import json
 from pathlib import Path
 import zipfile
@@ -8,7 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 FILES = [f'worker/{name}' for name in ['agent.py', 'api_client.py', 'config.py', 'desktop.py',
     'desktop_runtime.py', 'hardware.py', 'log_safety.py', 'pairing_client.py', 'requirements.txt',
     'resource_limits.py', 'runtime_release.py', 'state_store.py', 'task_executor.py', 'releases/current.json']]
-README = '''E-Waste Grid - Step 5 source desktop preview
+FILES += [f'worker/{name}' for name in ['product.py', 'launch.py', 'app_lifecycle.py', 'windows_startup.py', 'tray_control.py', 'package_checks.py']]
+README = '''E-Waste Grid - Step 6 source desktop preview
 
 This bundle contains reviewed source and the trusted offline release manifest.
 It contains no private settings, credentials, virtual environment, coordinator,
@@ -41,12 +43,16 @@ Check SHA-256 with Get-FileHash before opening a replacement source ZIP.
 Record OS/Docker version, import result, node ID and a ten-photo job with two
 accepted tasks and exact downloaded results. Never share pairing/node secrets,
 protected per-user state, admin tokens or full unreviewed logs. Installer/reboot
-and multi-device fault testing are later milestones. No cloud deployment here.
+and multi-device fault testing remain physical acceptance milestones. A separate
+Step 6 frozen installer is now available; this ZIP is the Python source preview,
+not that installer or the full development repository. No cloud deployment here.
 '''
 
 
 def main():
-    output = ROOT / 'output/handoff/E_Waste_Desktop_Worker_Step5_Source.zip'
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', type=Path, default=ROOT / 'output/handoff/E_Waste_Desktop_Worker_Step6_Source.zip')
+    output = parser.parse_args().output
     output.parent.mkdir(parents=True, exist_ok=True)
     inventory = {}
     with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED) as bundle:

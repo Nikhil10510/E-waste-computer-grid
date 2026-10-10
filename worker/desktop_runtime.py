@@ -9,6 +9,8 @@ from resource_limits import validate_limits, memory_bytes
 from state_store import load_state
 from log_safety import safe_text
 from runtime_release import OfflineRelease, DEFAULT_MANIFEST, run_command
+from launch import agent_command
+import psutil
 
 AGENT_PATH = Path(__file__).with_name('agent.py')
 
@@ -24,6 +26,8 @@ def worker_environment(api_url, directory, name, limits=None, release=None):
         MAX_POLL_INTERVAL='5',
         DUMMY_IMAGE='ewaste/dummy-workload:v1', INFERENCE_IMAGE='ewaste/ai-workload:v1')
     env['EWASTE_LOG_FILE'] = str(Path(directory) / 'agent.log')
+    env['EWASTE_OWNER_PID'] = str(os.getpid())
+    env['EWASTE_OWNER_CREATED'] = repr(psutil.Process().create_time())
     if release:
         env.update(DUMMY_IMAGE=release.images['dummy'], INFERENCE_IMAGE=release.images['image_inference'],
             WORKLOAD_RELEASE_MANIFEST=str(release.path), WORKLOAD_RELEASE_SHA256=release.fingerprint)
@@ -57,7 +61,7 @@ class DesktopRuntime:
             stop = self.directory / ('preflight-' + uuid.uuid4().hex + '.stop')
             environment['EWASTE_PREFLIGHT_STOP_FILE'] = str(stop)
             try:
-                stdout = run_command([sys.executable, str(AGENT_PATH), '--preflight'], cancel, timeout=90, env=environment,
+                stdout = run_command(agent_command('--preflight'), cancel, timeout=90, env=environment,
                     request_stop=lambda: stop.write_text('stop', encoding='ascii'))
                 completed = subprocess.CompletedProcess([], 0, stdout, '')
             except Exception as error:
@@ -65,7 +69,7 @@ class DesktopRuntime:
                 raise
             finally: stop.unlink(missing_ok=True)
         else:
-            completed = subprocess.run([sys.executable, str(AGENT_PATH), '--preflight'],
+            completed = subprocess.run(agent_command('--preflight'),
                 env=environment,
                 capture_output=True, text=True, timeout=90,
                 creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
@@ -90,7 +94,7 @@ class DesktopRuntime:
         if self.log_file.exists() and self.log_file.stat().st_size > 1024 * 1024:
             self.log_file.replace(self.log_file.with_suffix('.log.1'))
         with self.log_file.open('ab') as stream:
-            self.process = subprocess.Popen([sys.executable, str(AGENT_PATH)],
+            self.process = subprocess.Popen(agent_command(),
                 env=worker_environment(self.api_url, self.directory, self.name, self.limits, self.release), stdout=stream, stderr=subprocess.STDOUT,
                 creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
 

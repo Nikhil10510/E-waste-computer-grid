@@ -60,7 +60,9 @@ model Job {
   requestKey     String?  @unique
   requestHash    String?
   createdAt      DateTime @default(now())
+  startedAt      DateTime?
   completedAt    DateTime?
+  cancelledTasks Int      @default(0)
   
   tasks          Task[]
   metrics        Metric[]
@@ -82,11 +84,31 @@ model Task {
   assignedAt     DateTime?
   createdAt      DateTime @default(now())
   lastError      String?
+  completedAt    DateTime?
+  attempts       TaskAttempt[]
   metric         Metric?
   @@index([status, createdAt])
   @@index([status, leaseExpiresAt])
   @@index([nodeId, status])
   @@index([jobId, status])
+}
+
+// Historical assignments intentionally retain a node ID/name snapshot without
+// a Node FK: deleting a retired node must not erase who performed past work.
+model TaskAttempt {
+  id              String   @id @default(uuid())
+  taskId          String
+  task            Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  number          Int
+  nodeId          String
+  workerName      String
+  status          String   @default("ASSIGNED")
+  assignedAt      DateTime
+  finishedAt      DateTime?
+  executionTimeMs Int?
+  error           String?
+  @@unique([taskId, number])
+  @@index([nodeId, assignedAt])
 }
 
 model Metric {

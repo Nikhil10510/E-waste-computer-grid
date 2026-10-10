@@ -2,6 +2,11 @@
 
 Snapshot: 10 October 2026.
 
+Later update: Windows 0.6.2 packaging/local acceptance is implemented; the current
+app uses team-offline-v2. See [Windows release](WINDOWS_WORKER_RELEASE.md) and
+[physical acceptance](STEP7_PHYSICAL_ACCEPTANCE.md). Older v1 checksums and
+implementation-pending paragraphs below remain historical.
+
 ## 01 / The next milestone
 
 ### Purpose

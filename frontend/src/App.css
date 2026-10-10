@@ -316,3 +316,19 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
     grid-template-columns: 1fr;
   }
 }
+
+.job-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 16px 0; }
+.job-detail, .task-detail { border-top: 1px solid var(--panel-border); margin-top: 18px; padding-top: 18px; }
+.job-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.job-metrics dt { color: var(--text-muted); font-size: .85rem; }
+.job-metrics dd { margin-top: 6px; font-variant-numeric: tabular-nums; }
+.batch-link { color: var(--accent-blue); border: none; background: none; text-decoration: underline; cursor: pointer; font: inherit; }
+.attempt-list { margin: 16px 0 16px 24px; }
+.attempt-list li { margin: 12px 0; }
+.batch-error { color: var(--accent-orange); overflow-wrap: anywhere; margin-top: 6px; }
+.result-table td { white-space: normal; overflow-wrap: anywhere; min-width: 140px; }
+.danger { color: var(--accent-orange); }
+.text-button:disabled { opacity: .5; cursor: not-allowed; }
+.job-status.PARTIAL_SUCCESS, .job-status.FAILED { color: var(--accent-orange); }
+.status-PAUSED, .status-DRAINING { color: var(--accent-orange); }
+.status-REVOKED { color: var(--accent-red); }

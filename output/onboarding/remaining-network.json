@@ -1,0 +1,48 @@
+{
+  "status": "PASSED",
+  "date": "2026-10-10T10:45:27.585422+00:00",
+  "scope": "Two real frozen helpers on ONE PC; blocked loopback proxy and paused owned container; not physical LAN",
+  "checks": {
+    "expired_compute_stops_while_heartbeat_socket_is_blocked": true,
+    "same_batch_reassigned_to_other_worker_exactly_once": true
+  },
+  "cancellation_seconds_after_network_loss": 4.64,
+  "attempt_history": [
+    {
+      "number": 1,
+      "worker_id": "aaf9f979-cf25-4754-97f8-a8f091ecfcde",
+      "worker_name": "Network fixture 1",
+      "status": "COMPLETED",
+      "assigned_at": "2026-10-10T10:46:04.224Z",
+      "finished_at": "2026-10-10T10:46:17.069Z",
+      "execution_time_ms": 12531,
+      "error": null
+    },
+    {
+      "number": 0,
+      "worker_id": "a69c0a45-18ec-4751-9b89-f73b8fa0c9fe",
+      "worker_name": "Network fixture 0",
+      "status": "REQUEUED",
+      "assigned_at": "2026-10-10T10:45:54.651Z",
+      "finished_at": "2026-10-10T10:46:00.563Z",
+      "execution_time_ms": null,
+      "error": "Worker lease expired"
+    }
+  ],
+  "owned_containers_after_stop": 0,
+  "accepted_counts": {
+    "nodes": 2,
+    "pairings": 2,
+    "tasks": 1,
+    "metrics": 1,
+    "ownership": [
+      {
+        "id": "ec347d5c-8bc0-43c0-b553-210dcede78d2",
+        "jobId": "3178d911-7fb9-449a-a8f8-bed6ae7673c9",
+        "nodeId": "aaf9f979-cf25-4754-97f8-a8f091ecfcde",
+        "status": "COMPLETED",
+        "retryCount": 1
+      }
+    ]
+  }
+}
