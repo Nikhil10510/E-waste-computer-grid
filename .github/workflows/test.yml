@@ -11,6 +11,9 @@ jobs:
       - name: Get checksum-verified portable compiler
         shell: pwsh
         run: ./scripts/Get-NsisCompiler.ps1
+      - name: Check compiler download recovery and verification
+        shell: pwsh
+        run: ./scripts/tests/Test-NsisCompiler.ps1 -FixtureArchive "$pwd/.build/tools/nsis-3.13.zip"
       - name: Build unsigned Windows worker
         shell: pwsh
         run: ./scripts/Build-WindowsWorker.ps1 -NsisCompiler "$pwd/.build/tools/nsis-3.13/makensis.exe"
