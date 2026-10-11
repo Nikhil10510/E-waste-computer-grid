@@ -363,3 +363,11 @@ Core data entities are **Node, PairingSession, Job, Task, TaskAttempt and Metric
 The roadmap extends a working compute pipeline. Current boundaries include a single coordinator, shared-token administration, an unsigned Windows x64 development installer, Linux/amd64 workload images and Docker/WSL prerequisites. It is not yet a public multi-tenant or high-availability service. Hardware that cannot support the runtime needs another reuse route.
 
 **Our proposition:** make existing computers useful again, give their owners control, and show where every batch went. The cloud provides coordination; the second life happens on the laptops.
+
+## Contributors
+
+* **Nikhil Kumar** ([@Nikhil10510](https://github.com/Nikhil10510)) — AI inference workloads, model optimization, and AWS deployment
+* **Kushagra** ([@dkush2024-dot](https://github.com/dkush2024-dot)) — Architecture, coordination plane, and task scheduler
+* **Vaibhav** ([@vaibhavdevelopor](https://github.com/vaibhavdevelopor)) — Control plane, database, and integration
+* **Chinmay** — Worker agent runtime and infrastructure
+
